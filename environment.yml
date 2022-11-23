@@ -1,0 +1,16 @@
+name: OptiConvexe
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - jupyter
+  - numpy
+  - scipy
+  - matplotlib
+  - seaborn
+  - cvxpy
+  - black
+  - pylint
+  - isort
+  - mypy
