@@ -15,3 +15,7 @@ dependencies:
   - isort
   - mypy
   - pydocstyle
+  - docformatter
+
+platforms:
+  - linux-64
