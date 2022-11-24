@@ -17,6 +17,7 @@ dependencies:
   - pydocstyle
   - docformatter
   - nptyping
+  - scikit-learn
 
 platforms:
   - linux-64
