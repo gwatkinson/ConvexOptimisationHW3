@@ -1,11 +1,13 @@
 """Module that defines function classes that are used in the optimization algorithms."""
 
-import numpy as np
-from typing import Union, Tuple
 from numbers import Number
-from .custom_types import Function, Gradient, Hessian, Matrix, Vector
+from typing import Union
+
+import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
+
+from .custom_types import Function, Gradient, Hessian, Line, Matrix, Vector
+
 
 class FunctionHelper:
     """Class representing a function with its gradient and hessian."""
@@ -86,37 +88,47 @@ class FunctionHelper:
         """
         return self.f(x)
 
-    def plot_line(self, x0: Vector, direction: Vector, t_range: Tuple[Number, Number], n: int = 1000, **kwargs):
+    def plot_line(self, line: Line, **kwargs):
         """Plot the values of the function on a line defined by the initial point and a direction.
 
         Args:
-            x0 (Vector): The initial point that defines the line.
-            direction (Vector): The direction in which to go.
-            t_range (Tuple[Number, Number]): The range to apply to the direction (often -M, M).
-            n (int): The number of point to pick in the range.
+            line (Line): The line to plot.
+                Defined by a Line dataclass.
         """
-        t_plot = np.linspace(*t_range, n)
-        ts = np.repeat(t_plot.reshape(-1, 1), x0.shape[0], axis=1).T
-        xs = x0.reshape(-1, 1) + ts * direction.reshape(-1, 1)
+        ts = line.ts()  # Array of the ts values.
+        xs = line.xs()  # Array of the xs in the vector space.
         ys = np.apply_along_axis(self.f, 0, xs)
-        
-        sns.lineplot(x=t_plot, y=ys, **kwargs)
-    
-    def taylor_approximation(self, x0: Vector, direction: Vector,  t_range: Tuple[Number, Number], **kwargs):
-        """Plot the values of the function on a line defined by the initial point and a direction.
 
-        Args:
-            x0 (Vector): The initial point that defines the line.
-            direction (Vector): The direction in which to go.
-            t_range (Tuple[Number, Number]): The range to apply to the direction (often -M, M).
-        """
-        ts = np.linspace(*t_range, 1000)
-        xs = x0 + ts * direction
-        ys = self.f(xs)
-        
         sns.lineplot(x=ts, y=ys, **kwargs)
 
+    def plot_taylor_approximation(
+        self, line: Line, order: int = 1, offset: Number = 0, **kwargs
+    ):
+        """Plot the values of the taylor approximation of the function restricted to a line.
 
+        Args:
+            line (Line): The line to plot.
+                Defined by a Line dataclass.
+            order (int, optional): The order of the taylor approximation. Defaults to 1.
+            offset (Number, optional): The offset where to apply the taylor approximation.
+                Defaults to 0.
+        """
+        ts = line.ts()
+        inital_point = line.x0 + offset * line.direction
+        value = self.f(
+            inital_point
+        )  # Value of the function at the point of the approximation.
+        # First derivative of the line function at the initial point.
+        grad = self.g(inital_point).T @ line.direction
+
+        ys = value + (ts - offset) * grad  # Taylor approximation of the line function.
+
+        if order == 2:
+            # Second derivative of the line function at the initial point.
+            hess = line.direction.T @ self.h(inital_point) @ line.direction
+            ys += 0.5 * hess * (ts - offset) ** 2
+
+        sns.lineplot(x=ts, y=ys, **kwargs)
 
 
 class Quadratic(FunctionHelper):
