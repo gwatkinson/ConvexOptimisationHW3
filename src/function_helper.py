@@ -6,17 +6,32 @@ from typing import Union
 import numpy as np
 import seaborn as sns
 
-from .custom_types import Function, Gradient, Hessian, Line, Matrix, Vector, ScalarFunctionType
+from .custom_types import (
+    Function,
+    Gradient,
+    Hessian,
+    Line,
+    Matrix,
+    ScalarFunctionType,
+    Vector,
+)
 
 
 class ScalarFunction:
-    def __init__(self, f: ScalarFunctionType, g: ScalarFunctionType, h: ScalarFunctionType):
+    """Class representing a scalar function."""
+
+    def __init__(
+        self, f: ScalarFunctionType, g: ScalarFunctionType, h: ScalarFunctionType
+    ):
+        """Initiate a new scalar function."""
         self.f = f
         self.g = g
         self.h = h
-    
+
     def __call__(self, x: float) -> float:
+        """Return the value of the function evaluated at x."""
         return self.f(x)
+
 
 class FunctionHelper:
     """Class representing a function with its gradient and hessian."""
@@ -37,7 +52,6 @@ class FunctionHelper:
         self.f = f
         self.g = g
         self.h = h
-
 
     # Operations
     def __mul__(self, other: Union["FunctionHelper", Number]) -> "FunctionHelper":
@@ -99,31 +113,37 @@ class FunctionHelper:
         """
         return self.f(x)
 
-
     # Line subfunctions
     def line_func(self, line: Line) -> ScalarFunction:
         """Value of the function along a line."""
         x0, direction = line.x0, line.direction
-        f = lambda t: self.f(x0 + t*direction)
-        g = lambda t: direction.T @ self.g(x0 + t*direction)
-        h = lambda t: direction.T @ self.h(x0 + t*direction) @ direction
+        f = lambda t: self.f(x0 + t * direction)
+        g = lambda t: direction.T @ self.g(x0 + t * direction)
+        h = lambda t: direction.T @ self.h(x0 + t * direction) @ direction
         return ScalarFunction(f, g, h)
 
-    def line_tangent(self, line: Line, offset: float = 0.) -> ScalarFunction:
+    def line_tangent(self, line: Line, offset: float = 0.0) -> ScalarFunction:
         """Tangent of the line function with an offset on t."""
         line_f = self.line_func(line)
         return lambda t: line_f(offset) + (t - offset) * line_f.g(offset)
 
-    def line_second_order_approximation(self, line: Line, offset: float = 0.) -> ScalarFunction:
+    def line_second_order_approximation(
+        self, line: Line, offset: float = 0.0
+    ) -> ScalarFunction:
         """Tangent of the line function with an offset on t."""
         line_f = self.line_func(line)
-        return lambda t: line_f(offset) + (t - offset) * line_f.g(offset) + 0.5 * (t - offset)**2 * line_f.h(offset) 
+        return (
+            lambda t: line_f(offset)
+            + (t - offset) * line_f.g(offset)
+            + 0.5 * (t - offset) ** 2 * line_f.h(offset)
+        )
 
-    def line_alpha_tangent(self, line: Line, alpha: float, offset: float = 0.) -> ScalarFunction:
+    def line_alpha_tangent(
+        self, line: Line, alpha: float, offset: float = 0.0
+    ) -> ScalarFunction:
         """Second derivative of the line function."""
         line_f = self.line_func(line)
         return lambda t: line_f(offset) + alpha * (t - offset) * line_f.g(offset).T
-
 
     # Plotting functions
     def plot_line(self, line: Line, t_range=None, n=None, **kwargs):
@@ -133,7 +153,6 @@ class FunctionHelper:
             line (Line): The line to plot.
                 Defined by a Line dataclass.
         """
-        
         ts = line.ts(t_range, n)  # Array of the ts values.
         line_f = np.vectorize(self.line_func(line))
         ys = line_f(ts)
@@ -160,7 +179,13 @@ class FunctionHelper:
         sns.lineplot(x=ts, y=ys, **kwargs)
 
     def plot_alpha_tangent(
-        self, line: Line, alpha: float = 1, offset: Number = 0, t_range=None, n=None, **kwargs
+        self,
+        line: Line,
+        alpha: float = 1,
+        offset: Number = 0,
+        t_range=None,
+        n=None,
+        **kwargs
     ):
         """Plot the values of the taylor approximation of the function restricted to a line.
 
@@ -235,13 +260,13 @@ class LogAffineFunction(FunctionHelper):
 
         f = lambda x: float(np.nan_to_num(-np.log(b - a.T @ x), nan=np.inf))
         g = lambda x: a / (b - a.T @ x)
-        h = lambda x: a.reshape(-1, 1) @ a.reshape(-1, 1).T  / (b - a.T @ x)**2
+        h = lambda x: a.reshape(-1, 1) @ a.reshape(-1, 1).T / (b - a.T @ x) ** 2
         super().__init__(f, g, h)
 
 
-class LogBarrier():
+class LogBarrier:
     """Generate a log barrier function.
-    
+
     Which is a sum of LogAffineFunctions.
     """
 
@@ -252,7 +277,7 @@ class LogBarrier():
         It is a convex function.
 
         We note I the number of constraints and N the dimension of the data.
-        
+
         Args:
             a (Matrix): The matrix for the coefs (each line is a coef).
                 The format should look like (I, N)
@@ -262,13 +287,13 @@ class LogBarrier():
         self.b = b
         self.n_barriers = len(b)
         self.barriers = []
-        
-        total_barrier = 0.
+
+        total_barrier = 0.0
         for i in range(self.n_barriers):
             ai, bi = a[i, :], b[i]
             barrier = LogAffineFunction(ai, bi)
             self.barriers.append(barrier)
             total_barrier += barrier
-        
+
         f, g, h = barrier.f, barrier.g, barrier.h
         super().__init__(f, g, h)
