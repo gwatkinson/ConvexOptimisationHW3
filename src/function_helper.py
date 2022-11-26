@@ -239,26 +239,36 @@ class LogAffineFunction(FunctionHelper):
         super().__init__(f, g, h)
 
 
-class LogBarrier(FunctionHelper):
+class LogBarrier():
     """Generate a log barrier function.
     
     Which is a sum of LogAffineFunctions.
     """
 
     def __init__(self, a: Matrix, b: Vector) -> None:
-        """Generate a negative log affine function from the coef and the bias.
+        """Generate a negative log affine function from the coefs and the biases.
 
         The function takes the form `f(x) = - log(b_i - a_i.T @ x)`.
         It is a convex function.
 
+        We note I the number of constraints and N the dimension of the data.
+        
         Args:
             a (Matrix): The matrix for the coefs (each line is a coef).
-            b (Vector): The biases.
+                The format should look like (I, N)
+            b (Vector): The biases, in format (I,).
         """
         self.a = a
         self.b = b
-
-        f = lambda x: float(np.nan_to_num(-np.log(b - a.T @ x), nan=np.inf))
-        g = lambda x: a / (b - a.T @ x)
-        h = lambda x: a.reshape(-1, 1) @ a.reshape(-1, 1).T  / (b - a.T @ x)**2
+        self.n_barriers = len(b)
+        self.barriers = []
+        
+        total_barrier = 0.
+        for i in range(self.n_barriers):
+            ai, bi = a[i, :], b[i]
+            barrier = LogAffineFunction(ai, bi)
+            self.barriers.append(barrier)
+            total_barrier += barrier
+        
+        f, g, h = barrier.f, barrier.g, barrier.h
         super().__init__(f, g, h)
