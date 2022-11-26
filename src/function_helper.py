@@ -177,6 +177,25 @@ class FunctionHelper:
         sns.lineplot(x=ts, y=ys, **kwargs)
 
 
+class LinearFunction(FunctionHelper):
+    """Generate a linear function from the coef."""
+
+    def __init__(self, c: Vector) -> None:
+        """Generate a linear function from the coef.
+
+        The function takes the form `f(x) = c.T @ x`
+
+        Args:
+            c (Vector): The vector for the bias.
+        """
+        self.p = c
+
+        f = lambda x: c.T @ x
+        g = lambda x: c
+        h = lambda x: 0
+        super().__init__(f, g, h)
+
+
 class Quadratic(FunctionHelper):
     """Generate a quadratic function from the matrix and bias."""
 
@@ -198,7 +217,48 @@ class Quadratic(FunctionHelper):
         super().__init__(f, g, h)
 
 
-class LogBarrier(FunctionHelper):
-    """Generate a log barrier function."""
+class LogAffineFunction(FunctionHelper):
+    """Generate a function that is the opposite log of a affine function."""
 
-    pass
+    def __init__(self, a: Vector, b: float) -> None:
+        """Generate a negative log affine function from the coef and the bias.
+
+        The function takes the form `f(x) = - log(b - a.T @ x)`.
+        It is a convex function.
+
+        Args:
+            a (Vector): The vector for the bias.
+            b (float): The bias.
+        """
+        self.a = a
+        self.b = b
+
+        f = lambda x: float(np.nan_to_num(-np.log(b - a.T @ x), nan=np.inf))
+        g = lambda x: a / (b - a.T @ x)
+        h = lambda x: a.reshape(-1, 1) @ a.reshape(-1, 1).T  / (b - a.T @ x)**2
+        super().__init__(f, g, h)
+
+
+class LogBarrier(FunctionHelper):
+    """Generate a log barrier function.
+    
+    Which is a sum of LogAffineFunctions.
+    """
+
+    def __init__(self, a: Matrix, b: Vector) -> None:
+        """Generate a negative log affine function from the coef and the bias.
+
+        The function takes the form `f(x) = - log(b_i - a_i.T @ x)`.
+        It is a convex function.
+
+        Args:
+            a (Matrix): The matrix for the coefs (each line is a coef).
+            b (Vector): The biases.
+        """
+        self.a = a
+        self.b = b
+
+        f = lambda x: float(np.nan_to_num(-np.log(b - a.T @ x), nan=np.inf))
+        g = lambda x: a / (b - a.T @ x)
+        h = lambda x: a.reshape(-1, 1) @ a.reshape(-1, 1).T  / (b - a.T @ x)**2
+        super().__init__(f, g, h)
