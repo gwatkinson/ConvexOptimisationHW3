@@ -19,16 +19,16 @@ good-names=i,
            p,
            A,
            b,
-           ts, xs, ys, x0, n
+           ts, xs, ys, x0, n, y, ax, axs, t, e, a, ai, bi
 
 
 
 [DESIGN]
 # Maximum number of arguments for function / method.
-max-args=5
+max-args=7
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=100
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=5
