@@ -10,13 +10,17 @@ class UnconstrainedOptimizer:
     """Unconstrained optimizer."""
 
     # Init function
-    def __init__(self, func: FunctionHelper, x0: Vector, method="newton"):
+    def __init__(self, func: FunctionHelper, x0: Vector, method="newton", epsilon=1e-10, max_iter=100):
         """Initiate a new instance."""
         self.func = func
         self.x = x0.copy()
         self.y = self.func(self.x)
         self.grad = self.func.g(self.x)
         self.hess = self.func.h(self.x)
+        self.max_iter = max_iter
+        self.iter = 0
+        self.iter_t = 0
+        self.epsilon = epsilon
         
         if method == "newton":
             self.dir_func = self.newton_step
@@ -74,12 +78,14 @@ class UnconstrainedOptimizer:
         line_func = self.line_func()
         alpha_tangent = self.alpha_tangent(alpha)
         
-        _ = 0
-        while line_func(t) >=  alpha_tangent(t):
+        self.iter_t = 0
+        while line_func(t) - alpha_tangent(t) >= self.epsilon:
             t *= beta
             ts.append(t)
-            _ += 1
-            if _ == 100:
+            self.iter_t += 1
+            if self.iter_t == self.max_iter:
+                self.backtracking_t = ts
+                self.t = t
                 raise ValueError("Backtracking line search not converging.")
         
         self.backtracking_t = ts
@@ -110,19 +116,28 @@ class UnconstrainedOptimizer:
         self.update_lists()
         
     def optimise(self, error, alpha, beta, verbose=False):
-        _ = 0
-        while self.stop_criterion > error:
-            self.optimisation_step(alpha, beta)
-            _ += 1
-            if _ == 100:
-                raise ValueError("Optimisation not converging.")
-            if verbose:
-                print(f"Step {_}:")
-                print(f"\t r$\lambda^2$ = {self.stop_criterion:.2f}")
-                print(f"\t $y_{_}$ = {self.y:.2f}")
-                print(f"\t $y_{_-1} - y_{_}$ = {self.ys[-2] - self.y:.2f}")
-    
-    
+        while self.stop_criterion - error > self.epsilon:
+            try:
+                self.optimisation_step(alpha, beta)
+                self.iter += 1
+                if self.iter == self.max_iter:
+                    raise ValueError("Optimisation not converging.")
+                if verbose:
+                    print(f"Step {self.iter}:")
+                    print(f"\t Criterion = {self.stop_criterion:.2e}")
+                    print(f"\t y_{self.iter} = {self.y:.2g}")
+                    print(f"\t y_{self.iter-1} - y_{self.iter} = {self.ys[-2] - self.y:.2g}")
+            except ValueError as e:
+                print("Break in the algorithm")
+                print(e)
+                break
+        
+        print(f"Last step {self.iter}:")
+        print(f"\t Criterion = {self.stop_criterion:.2e}")
+        print(f"\t y_{self.iter} = {self.y:.2g}")
+        print(f"\t y_{self.iter-1} - y_{self.iter} = {self.ys[-2] - self.y:.2g}")
+        
+        
     # Plotting functions
     def plot_criterion(self, ax=None, **kwargs):
         ax = ax or plt.gca()
@@ -136,3 +151,13 @@ class UnconstrainedOptimizer:
         ax.set(xlabel='$k$', ylabel=r'$f(x^{(k)}) - p^*$')
         ax.plot(gap, **kwargs)
         ax.set_yscale('log')
+
+    def plot_line(self, alpha, t_range=None, n=None, **kwargs):
+        self.update_dir()
+        self.line.t_range = t_range or self.line.t_range
+        self.line.n = n or self.line.n
+        self.func.plot_line(self.line, label="Function", **kwargs)
+        self.func.plot_taylor_approximation(self.line, label="Tangent", ls='--', **kwargs)
+        self.func.plot_alpha_tangent(self.line, alpha=alpha, label=r"$\alpha$-tangent", ls='-.', **kwargs)
+        plt.title(rf"Line function in the chosen direction with $\alpha = {alpha}$")
+        
