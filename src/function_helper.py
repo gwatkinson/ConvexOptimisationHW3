@@ -6,8 +6,17 @@ from typing import Union
 import numpy as np
 import seaborn as sns
 
-from .custom_types import Function, Gradient, Hessian, Line, Matrix, Vector
+from .custom_types import Function, Gradient, Hessian, Line, Matrix, Vector, ScalarFunctionType
 
+
+class ScalarFunction:
+    def __init__(self, f: ScalarFunctionType, g: ScalarFunctionType, h: ScalarFunctionType):
+        self.f = f
+        self.g = g
+        self.h = h
+    
+    def __call__(self, x: float) -> float:
+        return self.f(x)
 
 class FunctionHelper:
     """Class representing a function with its gradient and hessian."""
@@ -29,6 +38,8 @@ class FunctionHelper:
         self.g = g
         self.h = h
 
+
+    # Operations
     def __mul__(self, other: Union["FunctionHelper", Number]) -> "FunctionHelper":
         """Define the multiplication for a function.
 
@@ -88,17 +99,44 @@ class FunctionHelper:
         """
         return self.f(x)
 
-    def plot_line(self, line: Line, **kwargs):
+
+    # Line subfunctions
+    def line_func(self, line: Line) -> ScalarFunction:
+        """Value of the function along a line."""
+        x0, direction = line.x0, line.direction
+        f = lambda t: self.f(x0 + t*direction)
+        g = lambda t: direction.T @ self.g(x0 + t*direction)
+        h = lambda t: direction.T @ self.h(x0 + t*direction) @ direction
+        return ScalarFunction(f, g, h)
+
+    def line_tangent(self, line: Line, offset: float = 0.) -> ScalarFunction:
+        """Tangent of the line function with an offset on t."""
+        line_f = self.line_func(line)
+        return lambda t: line_f(offset) + (t - offset) * line_f.g(offset)
+
+    def line_second_order_approximation(self, line: Line, offset: float = 0.) -> ScalarFunction:
+        """Tangent of the line function with an offset on t."""
+        line_f = self.line_func(line)
+        return lambda t: line_f(offset) + (t - offset) * line_f.g(offset) + 0.5 * (t - offset)**2 * line_f.h(offset) 
+
+    def line_alpha_tangent(self, line: Line, alpha: float, offset: float = 0.) -> ScalarFunction:
+        """Second derivative of the line function."""
+        line_f = self.line_func(line)
+        return lambda t: line_f(offset) + alpha * (t - offset) * line_f.g(offset).T
+
+
+    # Plotting functions
+    def plot_line(self, line: Line, t_range=None, n=None, **kwargs):
         """Plot the values of the function on a line defined by the initial point and a direction.
 
         Args:
             line (Line): The line to plot.
                 Defined by a Line dataclass.
         """
-        ts = line.ts()  # Array of the ts values.
-        xs = line.xs()  # Array of the xs in the vector space.
-        ys = np.apply_along_axis(self.f, 0, xs)
-
+        
+        ts = line.ts(t_range, n)  # Array of the ts values.
+        line_f = np.vectorize(self.line_func(line))
+        ys = line_f(ts)
         sns.lineplot(x=ts, y=ys, **kwargs)
 
     def plot_taylor_approximation(
@@ -114,20 +152,28 @@ class FunctionHelper:
                 Defaults to 0.
         """
         ts = line.ts()
-        inital_point = line.x0 + offset * line.direction
-        value = self.f(
-            inital_point
-        )  # Value of the function at the point of the approximation.
-        # First derivative of the line function at the initial point.
-        grad = self.g(inital_point).T @ line.direction
+        if order == 1:
+            f = np.vectorize(self.line_tangent(line, offset))
+        elif order == 2:
+            f = np.vectorize(self.line_second_order_approximation(line, offset))
+        ys = f(ts)  # Taylor approximation of the line function.
+        sns.lineplot(x=ts, y=ys, **kwargs)
 
-        ys = value + (ts - offset) * grad  # Taylor approximation of the line function.
+    def plot_alpha_tangent(
+        self, line: Line, alpha: float = 1, offset: Number = 0, t_range=None, n=None, **kwargs
+    ):
+        """Plot the values of the taylor approximation of the function restricted to a line.
 
-        if order == 2:
-            # Second derivative of the line function at the initial point.
-            hess = line.direction.T @ self.h(inital_point) @ line.direction
-            ys += 0.5 * hess * (ts - offset) ** 2
-
+        Args:
+            line (Line): The line to plot.
+                Defined by a Line dataclass.
+            order (int, optional): The order of the taylor approximation. Defaults to 1.
+            offset (Number, optional): The offset where to apply the taylor approximation.
+                Defaults to 0.
+        """
+        ts = line.ts(t_range, n)
+        f = np.vectorize(self.line_alpha_tangent(line, alpha, offset))
+        ys = f(ts)  # Taylor approximation of the line function.
         sns.lineplot(x=ts, y=ys, **kwargs)
 
 
