@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from src.custom_types import Line, Vector
-from src.function_helper import FunctionHelper
+from src.function_helper import FunctionHelper, LogBarrier, Quadratic
 
 
 class UnconstrainedOptimizer:
@@ -18,8 +18,12 @@ class UnconstrainedOptimizer:
         func: FunctionHelper,
         x0: Vector,
         method="newton",
-        epsilon=1e-10,
+        alpha=0.4,
+        beta=0.6,
+        error=1e-10,
+        epsilon=1e-14,
         max_iter=100,
+        max_t_iter=100
     ):
         """Initiate a new instance."""
         self.func = func
@@ -28,6 +32,7 @@ class UnconstrainedOptimizer:
         self.grad = self.func.g(self.x)
         self.hess = self.func.h(self.x)
         self.max_iter = max_iter
+        self.max_t_iter = max_t_iter
         self.iter = 0
         self.iter_t = 0
         self.epsilon = epsilon
@@ -35,6 +40,9 @@ class UnconstrainedOptimizer:
         self.line = None
         self.backtracking_t = None
         self.t = None
+        self.alpha = alpha
+        self.beta = beta
+        self.error = error
 
         if method == "newton":
             self.dir_func = self.newton_step
@@ -79,8 +87,9 @@ class UnconstrainedOptimizer:
         """Return the function restricted to the current line."""
         return self.func.line_func(self.line)
 
-    def alpha_tangent(self, alpha):
+    def alpha_tangent(self, alpha=None):
         """Return the alpha tangent of the line function."""
+        alpha = alpha or self.alpha
         return self.func.line_alpha_tangent(self.line, alpha)
 
     # Update functions
@@ -89,10 +98,13 @@ class UnconstrainedOptimizer:
         self.direction = self.dir_func()
         self.line = Line(self.x, self.direction)
 
-    def backtracking_line_search(self, alpha: float, beta: float):
+    def backtracking_line_search(self, alpha: float=None, beta: float=None):
         """Calculate the step size with backtracking_line_search."""
         t = 1
         ts = [1]
+        
+        alpha = alpha or self.alpha
+        beta = beta or self.beta
 
         line_func = self.line_func()
         alpha_tangent = self.alpha_tangent(alpha)
@@ -102,7 +114,7 @@ class UnconstrainedOptimizer:
             t *= beta
             ts.append(t)
             self.iter_t += 1
-            if self.iter_t == self.max_iter:
+            if self.iter_t >= self.max_t_iter:
                 self.backtracking_t = ts
                 self.t = t
                 raise ValueError("Backtracking line search not converging.")
@@ -130,21 +142,27 @@ class UnconstrainedOptimizer:
         self.backtracking_ts.append(self.backtracking_t)
         self.stop_criterions.append(self.stop_criterion)
 
-    def optimisation_step(self, alpha, beta):
+    def optimisation_step(self, alpha=None, beta=None):
         """Chain the previous function to create a optimisation step."""
+        alpha = alpha or self.alpha
+        beta = beta or self.beta
         self.update_dir()
         self.backtracking_line_search(alpha, beta)
         self.update_x()
         self.update_lists()
+        self.iter += 1
 
-    def optimise(self, error, alpha, beta, verbose=False):
+    def optimise(self, error=None, alpha=None, beta=None, max_iter=None, verbose=False):
         """Define the whole optimisation program."""
+        error = error or self.error
+        max_iter = max_iter or self.max_iter
+        alpha = alpha or self.alpha
+        beta = beta or self.beta
         while self.stop_criterion - error > self.epsilon:
             try:
                 self.optimisation_step(alpha, beta)
-                self.iter += 1
-                if self.iter == self.max_iter:
-                    raise ValueError("Optimisation not converging.")
+                if self.iter >= self.max_iter:
+                    raise ValueError("Unconstrained optimisation not converging.")
                 if verbose:
                     print(f"Step {self.iter}:")
                     print(f"\t Criterion = {self.stop_criterion:.2e}")
@@ -153,14 +171,13 @@ class UnconstrainedOptimizer:
                         f"\t y_{self.iter-1} - y_{self.iter} = {self.ys[-2] - self.y:.2g}"
                     )
             except ValueError as e:
-                print("Break in the algorithm")
                 print(e)
                 break
 
-        print(f"Last step {self.iter}:")
-        print(f"\t Criterion = {self.stop_criterion:.2e}")
-        print(f"\t y_{self.iter} = {self.y:.2g}")
-        print(f"\t y_{self.iter-1} - y_{self.iter} = {self.ys[-2] - self.y:.2g}")
+        if verbose:
+            print(f"Last step {self.iter}:")
+            print(f"\t Criterion = {self.stop_criterion:.2e}")
+            print(f"\t y_{self.iter} = {self.y:.2g}")
 
     # Plotting functions
     def plot_criterion(self, ax=None, **kwargs):
@@ -229,9 +246,10 @@ class UnconstrainedOptimizer:
         fig.tight_layout()
         return fig
 
-    def plot_line(self, alpha, t_range=None, n=None, **kwargs):
+    def plot_line(self, alpha=None, t_range=None, n=None, **kwargs):
         """Plot the current line function with the tangent and alpha tangent."""
         self.update_dir()
+        self.alpha = alpha or self.alpha
         self.line.t_range = t_range or self.line.t_range
         self.line.n = n or self.line.n
         self.func.plot_line(self.line, label="Function", **kwargs)
@@ -242,3 +260,122 @@ class UnconstrainedOptimizer:
             self.line, alpha=alpha, label=r"$\alpha$-tangent", ls="-.", **kwargs
         )
         plt.title(rf"Line function in the chosen direction with $\alpha = {alpha}$")
+
+class BarrierMethod:
+    """Constrained optimizer."""
+
+    def __init__(
+        self,
+        func,
+        A,
+        b,
+        x0,
+        t0,
+        mu,
+        centering_kwargs,
+        error=1e-10,
+        tol=1e-14
+    ):
+        """Initiate the optimizer."""
+        self.func = func
+        self.A = A
+        self.b = b
+        self.log_barrier = LogBarrier(A, b)
+        self.m = len(b)
+        self.x = x0
+        self.y = self.func(self.x)
+        self.t = t0
+        self.stop_criterion = self.m / self.t
+        
+        self.mu = mu
+        self.error = error
+        self.tol = tol
+        self.iter = 0
+        self.kwargs = centering_kwargs
+        
+        self.center_f = None
+        self.center_pb = None
+        self.number_centering_step = None
+        
+        self.xs = [self.x]
+        self.ys = [self.y]
+        self.ts = []
+        self.stop_criterions = []
+        self.center_pbs = []
+        self.number_centering_steps = []
+
+
+    def update_centering_function(self):
+        """Compute the optimal point of the current centering problem."""
+        self.center_f = self.t * self.func + self.log_barrier
+        self.center_pb = UnconstrainedOptimizer(self.center_f, self.x, **self.kwargs)
+        
+    def optimise_centering_problem(self):
+        self.center_pb.optimise()
+        self.number_centering_step = self.center_pb.iter
+    
+    def centering_step(self):
+        self.x = self.center_pb.x
+        self.y = self.func(self.x)
+        self.stop_criterion = self.m / self.t
+    
+    def update_lists(self):
+        self.xs.append(self.x)
+        self.ys.append(self.y)
+        self.ts.append(self.t)
+        self.stop_criterions.append(self.stop_criterion)
+        self.center_pbs.append(self.center_pb)
+        self.number_centering_steps.append(self.number_centering_step)
+    
+    def update_t(self):
+        self.t *= self.mu
+    
+    def optimisation_step(self):
+        self.update_centering_function()
+        self.optimise_centering_problem()
+        self.centering_step()
+        self.update_lists()
+        self.update_t()
+        self.iter += 1
+        
+    def optimise(self, error=None, verbose=False):
+        """Optimise the problem."""
+        error = error or self.error
+        while self.stop_criterion - self.error >= self.tol:
+            try:
+                self.optimisation_step()
+                if verbose:
+                    print(f"Step {self.iter}:")
+                    print(f"\t Criterion = {self.stop_criterion:.2e}")
+                    print(f"\t y_{self.iter} = {self.y:.2g}")
+                    print(f"\t Centering step final criterion = {self.center_pb.stop_criterion:.2g}")
+                    print(f"\t Number of steps in centering = {self.number_centering_step}")
+            except ValueError as e:
+                print("Centering step not converging")
+                print(e)
+                break
+        
+        
+class QuadraticBarrierMethod(BarrierMethod):
+    """Barrier method for a quadratic function."""
+    
+    def __init__(
+        self,
+        Q, p, A, b, x0, t0, mu, centering_kwargs, error=1e-10, tol=1e-14
+    ):
+        """Initiate a quadratic function and the associated barrier method."""
+        self.Q = Q
+        self.p = p
+        quadratic_func = Quadratic(Q, p)
+
+        super().__init__(
+            quadratic_func,
+            A,
+            b,
+            x0,
+            t0,
+            mu,
+            centering_kwargs,
+            error,
+            tol
+        )
