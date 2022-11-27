@@ -101,6 +101,11 @@ class FunctionHelper:
             g = self.g
             h = self.h
         return FunctionHelper(f, g, h)
+    
+    def __radd__(self, other: Union["FunctionHelper", Number]) -> "FunctionHelper":
+        """Define the rightside addition for a function."""
+        return self.__add__(other)
+        
 
     def __call__(self, x: Vector) -> Number:
         """Call method to quickly use the main function.
@@ -264,13 +269,13 @@ class LogAffineFunction(FunctionHelper):
         super().__init__(f, g, h)
 
 
-class LogBarrier:
+class LogBarrier(FunctionHelper):
     """Generate a log barrier function.
 
     Which is a sum of LogAffineFunctions.
     """
 
-    def __init__(self, a: Matrix, b: Vector) -> None:
+    def __init__(self, A: Matrix, b: Vector) -> None:
         """Generate a negative log affine function from the coefs and the biases.
 
         The function takes the form `f(x) = - log(b_i - a_i.T @ x)`.
@@ -279,18 +284,18 @@ class LogBarrier:
         We note I the number of constraints and N the dimension of the data.
 
         Args:
-            a (Matrix): The matrix for the coefs (each line is a coef).
+            A (Matrix): The matrix for the coefs (each line is a coef).
                 The format should look like (I, N)
             b (Vector): The biases, in format (I,).
         """
-        self.a = a
+        self.a = A
         self.b = b
         self.n_barriers = len(b)
         self.barriers = []
 
-        total_barrier = 0.0
+        total_barrier = 0.
         for i in range(self.n_barriers):
-            ai, bi = a[i, :], b[i]
+            ai, bi = A[i, :], b[i]
             barrier = LogAffineFunction(ai, bi)
             self.barriers.append(barrier)
             total_barrier += barrier
