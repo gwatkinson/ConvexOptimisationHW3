@@ -4,8 +4,9 @@ In the context of the Convex Optimization course of the MVA
 """
 import matplotlib.pyplot as plt
 
-plt.style.use("seaborn")
+plt.style.use("seaborn-v0_8-pastel")
 plt.rcParams["text.latex.preamble"] = r"\boldmath"
+plt.rcParams['legend.frameon'] = True
 
 SMALL_SIZE = 10
 MEDIUM_SIZE = 12
