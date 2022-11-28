@@ -2,15 +2,14 @@
 
 from __future__ import absolute_import
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 import cvxpy as cp
+import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+from tqdm import tqdm
 
 from src.custom_types import Line, Vector
 from src.function_helper import FunctionHelper, LogBarrier, Quadratic
-
-from tqdm import tqdm
 
 
 class UnconstrainedOptimizer:
