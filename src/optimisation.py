@@ -178,7 +178,8 @@ class UnconstrainedOptimizer:
                         f"\t y_{self.iter-1} - y_{self.iter} = {self.ys[-2] - self.y:.2g}"
                     )
             except ValueError as e:
-                print(e)
+                if verbose:
+                    print(e)
                 break
 
         if verbose:
@@ -360,8 +361,9 @@ class BarrierMethod:
                     print(f"\t Centering step final criterion = {self.center_pb.stop_criterion:.6g}")
                     print(f"\t Number of steps in centering = {self.number_centering_step}")
             except ValueError as e:
-                print("Centering step not converging")
-                print(e)
+                if verbose:
+                    print("Centering step not converging")
+                    print(e)
                 break
     
     # Plotting functions
@@ -428,10 +430,10 @@ class QuadraticBarrierMethod(BarrierMethod):
         """Initiate a quadratic function and the associated barrier method."""
         self.Q = Q
         self.p = p
-        quadratic_func = Quadratic(Q, p)
+        self.quadratic_func = Quadratic(Q, p)
 
         super().__init__(
-            quadratic_func,
+            self.quadratic_func,
             A,
             b,
             x0,
@@ -458,7 +460,7 @@ class LASSOProblem:
 
         self.lasso_func = lambda w: 0.5 * np.linalg.norm(X @ w - y)**2 + ld * np.linalg.norm(w, 1)
         self.cvxpy_lasso_func = lambda w: 0.5 * cp.norm2(X @ w - y)**2 + ld * cp.norm1(w)
-        self.dual_func = lambda v: - 0.5 * np.linalg.norm(v)**2 - v.T @ y
+        self.dual_func = lambda v: - 0.5 * v.T @ v - v.T @ y
 
         self.v_stars = []
         self.v_star = None
