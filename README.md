@@ -12,7 +12,7 @@ It contains a theoritical part and a practical one. Both will be in the final no
 You can recreate the exact same conda environment from the lock files:
 
 ```
-conda create -n <YOURENV> --file conda-<OS>.lock
+conda create -n <YOURENV> --file lock_files/conda-<OS>.lock
 
 conda activate <YOURENV>
 ```
@@ -22,7 +22,7 @@ The main packages are numpy, cvxpy and plotting libraries.
 If the lock file doesn't work, you can install the package with 
 
 ```
-conda create -n <YOURENV> --file environment.yml
+conda create -n <YOURENV> --file lock_files/environment.yml
 ```
 But the version might be different.
 
@@ -52,3 +52,7 @@ The plot are generated in the first section, but other experiments are run in th
 ## Package
 
 The package developed is in the `src` folder.
+
+## Report 
+
+You can find the pdf report that I sent in `pdfs/FinalReport.pdf`.
