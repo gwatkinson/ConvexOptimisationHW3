@@ -101,11 +101,10 @@ class FunctionHelper:
             g = self.g
             h = self.h
         return FunctionHelper(f, g, h)
-    
+
     def __radd__(self, other: Union["FunctionHelper", Number]) -> "FunctionHelper":
         """Define the rightside addition for a function."""
         return self.__add__(other)
-        
 
     def __call__(self, x: Vector) -> Number:
         """Call method to quickly use the main function.
@@ -293,7 +292,7 @@ class LogBarrier(FunctionHelper):
         self.n_barriers = len(b)
         self.barriers = []
 
-        total_barrier = 0.
+        total_barrier = 0.0
         for i in range(self.n_barriers):
             ai, bi = A[i, :], b[i]
             barrier = LogAffineFunction(ai, bi)

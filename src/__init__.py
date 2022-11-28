@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 plt.style.use("seaborn-v0_8-poster")
 plt.rcParams["text.latex.preamble"] = r"\boldmath"
-plt.rcParams['legend.frameon'] = True
+plt.rcParams["legend.frameon"] = True
 
 SMALL_SIZE = 10
 MEDIUM_SIZE = 12
