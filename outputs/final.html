@@ -14620,8 +14620,19 @@ often used on the regression coefficients $w$ in order to enforce sparsity of th
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Question-1">Question 1<a class="anchor-link" href="#Question-1">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <font color='navyblue'>
-1. Derive the dual problem of LASSO and format it as a general Quadratic Problem as follows
+Derive the dual problem of LASSO and format it as a general Quadratic Problem as follows
 \begin{equation}
 \tag{QP}
 \begin{array}{ll}
@@ -14686,13 +14697,15 @@ g(v) &amp;= \inf_{w, z} \frac{1}{2} z^T z + \lambda \left\lVert w \right\rVert_1
 <li>$b = \lambda \cdot \mathbb{1}_{2d} \in \mathbb{R}^{2d}$</li>
 </ul>
 <p>and 
-$$
-A = \left(\begin{array}{c}
-X^T \\
--X^T
-\end{array}\right)
+\begin{equation*}
+A = \left(
+    \begin{array}{c}
+    X^T \\
+    -X^T
+    \end{array}
+\right)
 \in \mathbb{R}^{2d \times n}
-$$</p>
+\end{equation*}</p>
 <p>For the next question, we pose $m=2d$.</p>
 
 </div>
@@ -14705,8 +14718,19 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Question-2-and-3">Question 2 and 3<a class="anchor-link" href="#Question-2-and-3">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <font color='navyblue'>
-1. Impliment the barrier method to solve QP.
+Impliment the barrier method to solve QP.
 <ul>
 <li>Write a function <code>v_seq = centering_step(Q, p, A, b, t, v0, eps)</code> which impliments the Newton method to solve the centering step given the inputs $(Q, p, A, b)$, the barrier method parameter $t$ (see lectures), initial variable $v_0$ and a target precision $\epsilon$. The function outputs the sequence of variables iterates $(v_i)_{i=1, \ldots, n_{\epsilon}}$, where $n_{\epsilon}$ is the number of iterations to obtain the $\epsilon$ precision. Use a backtracking line search with appropriate parameters.</li>
 <li>Write a function <code>v_seq = barr_method(Q, p, A, b, v0, eps)</code> which implements the barrier method to solve QP using precedent function given the data inputs $(Q, p, A, b)$, a feasible point $v_0$, a precision criterion $\epsilon$. The function ouptuts the sequence of variables iterates $(v_i)_{i=1, \ldots, n_{\epsilon}}$, where $n_{\epsilon}$ is the number of iterations to obtain the $\epsilon$ precision.</li>
@@ -14755,7 +14779,8 @@ $$<p>with $a_i \in \mathbb{R}^n$.</p>
 \end{align*}<p>since $\nabla^2 f_i(v) = 0$.</p>
 <p>Lastly, to get $w^*$ from the dual problem, we can use the fact that the Lagragian is minimized by the optimal point, the gradient of the Lagragian with respoect to $z$ vanishes. Which gives us:</p>
 \begin{align*}
-    \nabla_z \mathcal{L}(w^*, z^*, v^*) &amp;= 0 \\
+    \nabla_z \mathcal{L}(w^*, z^*, v^*) &amp;= \nabla_z \left[ \frac{1}{2} (z^*)^T z^* + \lambda \left\lVert w^* \right\rVert_1 - (v^*)^T (y-Xw^*+z^*) \right] \\
+    &amp;= 0 \\
     &amp;= z^* - v^* \\
     &amp;= X w^* - y - v^*
 \end{align*}<p>Given $v^*, X$ and $y$, we can get $w^*$ by resolving the least squares :</p>
@@ -14796,7 +14821,7 @@ You can find the complete code on this GitHub repository: <a href="https://githu
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[183]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -14828,7 +14853,7 @@ You can find the complete code on this GitHub repository: <a href="https://githu
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[194]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -14918,7 +14943,7 @@ You can find the complete code on this GitHub repository: <a href="https://githu
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[195]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">newton_step</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">grad_f</span><span class="p">:</span> <span class="n">f_type</span><span class="p">,</span> <span class="n">hess_f</span><span class="p">:</span> <span class="n">f_type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
@@ -15047,8 +15072,8 @@ You can find the complete code on this GitHub repository: <a href="https://githu
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h3 id="Generating-the-data">Generating the data<a class="anchor-link" href="#Generating-the-data">&#182;</a></h3><p>This cell generates random data for a regression model. It was taken from the <a href="https://www.cvxpy.org/examples/machine_learning/lasso_regression.html">CVXPY documentation</a>, and adapted for our needs.</p>
-<p>It defines a sparse $\beta$ coefficient, then a random $X$ dataset.
-Then, it gives 
+<p>It defines $\beta$ coefficients, then remove a portion of them to create a sparse problem. Then, it generates a random $X$ dataset.
+Finally, we have 
 $$
 y = X \beta + \mathcal{N}(0, \sigma^2)
 $$</p>
@@ -15062,10 +15087,10 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[196]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[62]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ld</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ld</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
     <span class="s2">&quot;Generates data matrix X and observations Y.&quot;</span>
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">beta_star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
@@ -15093,7 +15118,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Test-if-the-algorithms-on-the-data">Test if the algorithms on the data<a class="anchor-link" href="#Test-if-the-algorithms-on-the-data">&#182;</a></h3><p>This section tests the preceding function on generated data.</p>
+<h2 id="Test-if-the-algorithms-on-the-data">Test if the algorithms on the data<a class="anchor-link" href="#Test-if-the-algorithms-on-the-data">&#182;</a></h2><p>This section tests the preceding function on generated data.</p>
 
 </div>
 </div>
@@ -15103,11 +15128,11 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[197]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[63]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Generate the data</span>
-<span class="n">N</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">D</span> <span class="o">=</span> <span class="mi">50</span>
 <span class="n">M</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">D</span>
 <span class="n">ld</span> <span class="o">=</span> <span class="mi">10</span>
@@ -15134,18 +15159,17 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[198]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[64]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Optimise with the barrier method</span>
-<span class="n">vs</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">l_iterates</span> <span class="o">=</span> <span class="n">barr_method</span><span class="p">(</span>
-    <span class="n">Q</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">`vs` contains the variables iterates.</span>
 <span class="sd">`l_iterates` contains the other iterates generated during the centering steps.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="n">vs</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">l_iterates</span> <span class="o">=</span> <span class="n">barr_method</span><span class="p">(</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
 </pre></div>
 
      </div>
@@ -15164,108 +15188,11 @@ $$</p>
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
 
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>t = 1 and m/t =  1.00e+02
-	Criterion: 6.1570e+01
-	Criterion: 6.1570e+01
-	Criterion: 7.7747e+00
-	Criterion: 1.0368e+00
-	Criterion: 1.1757e-02
-	Criterion: 1.1598e-05
-t = 20 and m/t =  5.00e+00
-	Criterion: 8.2026e+02
-	Criterion: 8.2026e+02
-	Criterion: 5.0275e+02
-	Criterion: 2.5479e+02
-	Criterion: 8.6708e+01
-	Criterion: 3.0886e+01
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/tmp/ipykernel_18892/2105800071.py:19: RuntimeWarning: invalid value encountered in log
+<pre>/tmp/ipykernel_16274/2105800071.py:19: RuntimeWarning: invalid value encountered in log
   return float(np.nan_to_num(-np.log(bi - ai.T @ v), nan=np.inf))
 </pre>
 </div>
-</div>
-<div class="jp-OutputArea-child">
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>	Criterion: 4.8105e+00
-	Criterion: 1.4794e-01
-	Criterion: 9.0683e-03
-	Criterion: 3.0466e-05
-t = 400 and m/t =  2.50e-01
-	Criterion: 1.8065e+03
-	Criterion: 1.8065e+03
-	Criterion: 4.9913e+02
-	Criterion: 1.9231e+02
-	Criterion: 6.7612e+01
-	Criterion: 1.7767e+01
-	Criterion: 9.9733e-01
-	Criterion: 2.0057e-01
-	Criterion: 2.2309e-02
-	Criterion: 4.5421e-04
-	Criterion: 1.9686e-07
-t = 8000 and m/t =  1.25e-02
-	Criterion: 2.1298e+03
-	Criterion: 2.1298e+03
-	Criterion: 3.6710e+02
-	Criterion: 8.9048e+01
-	Criterion: 9.1028e+00
-	Criterion: 3.2250e-01
-	Criterion: 1.9191e-02
-	Criterion: 1.1527e-04
-t = 160000 and m/t =  6.25e-04
-	Criterion: 2.1691e+03
-	Criterion: 2.1691e+03
-	Criterion: 3.1087e+02
-	Criterion: 3.1695e+00
-	Criterion: 3.6660e-03
-	Criterion: 7.4347e-06
-t = 3200000 and m/t =  3.13e-05
-	Criterion: 2.1663e+03
-	Criterion: 2.1663e+03
-	Criterion: 3.0501e+02
-	Criterion: 3.0715e-01
-	Criterion: 9.6010e-04
-	Criterion: 1.5462e-07
-t = 64000000 and m/t =  1.56e-06
-	Criterion: 2.1660e+03
-	Criterion: 2.1660e+03
-	Criterion: 3.0461e+02
-	Criterion: 8.6350e-02
-	Criterion: 9.2345e-04
-	Criterion: 1.4212e-07
-t = 1280000000 and m/t =  7.81e-08
-	Criterion: 2.1660e+03
-	Criterion: 2.1660e+03
-	Criterion: 3.0459e+02
-	Criterion: 7.4962e-02
-	Criterion: 9.2177e-04
-Backtracking not converging
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[198]:</div>
-
-
-
-
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;\n`vs` contains the variables iterates.\n`l_iterates` contains the other iterates generated during the centering steps.\n&#39;</pre>
-</div>
-
 </div>
 
 </div>
@@ -15277,7 +15204,7 @@ Backtracking not converging
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[199]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[65]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># The final optimal point</span>
@@ -15298,16 +15225,32 @@ Backtracking not converging
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[199]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[65]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([ 0.73181408, -0.84530778, -0.5256388 , -2.35593477, -1.00330414,
-        0.71251307, -1.63990239, -0.39663128,  0.82584064, -1.04842947,
-       -1.0351969 ,  0.15396756, -0.92493193, -0.54019353, -0.10492115,
-        0.56742521, -0.44287174,  0.32671034, -4.19676048, -1.57367554])</pre>
+<pre>array([ 0.31552562, -0.11703727,  0.01728237, -0.61737851, -0.99928907,
+        1.46258562, -0.42576194,  0.8568421 , -0.28038062, -0.56092876,
+       -0.65274369,  0.29339506,  0.31064405, -0.89736969, -1.7106127 ,
+       -1.21882627,  0.7451865 ,  1.78745409, -0.35292253, -1.38315793,
+       -0.26489221,  0.00563829,  0.3942802 , -0.00680659, -0.92309693,
+        0.06081644,  0.10674194,  1.11850177,  1.64766325,  0.70049316,
+        0.98543705, -0.52862293, -0.26416066, -1.50249411,  1.8282942 ,
+        0.3445711 ,  0.21621665, -1.34963551,  0.18589437,  1.17286416,
+       -0.1218349 ,  1.1707134 ,  0.61834599, -0.16522791,  0.31948091,
+        1.71364731,  0.81019719,  0.26572859,  0.38634092,  0.30676617,
+        0.10183189, -0.35887503, -1.8900325 ,  0.95092626,  0.13033911,
+       -2.07744882, -1.19539063, -2.35701503,  1.03831051, -0.12284202,
+       -0.11956244,  0.87448636, -0.02591839, -1.93634463, -1.33856515,
+       -1.25210765,  0.31492665, -1.22922936,  0.95031641, -0.89167381,
+       -0.64247143, -1.29265585, -0.16343546,  0.56648747,  1.06346221,
+       -1.40619349, -1.49697813,  0.13200218, -0.88739194, -0.80867504,
+        0.6736527 , -0.40367335,  0.48625451, -0.05944894,  0.1951453 ,
+        1.70126284,  1.40729699, -1.19444094,  0.06878788, -0.69743594,
+       -0.32995683, -0.12279312, -0.31907041, -0.72057493,  0.23273406,
+       -2.01483994,  1.09135349, -0.32760838,  1.08556586, -0.71555631])</pre>
 </div>
 
 </div>
@@ -15333,7 +15276,7 @@ Backtracking not converging
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[200]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[66]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">v_star</span> <span class="o">@</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
@@ -15352,13 +15295,13 @@ Backtracking not converging
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[200]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[66]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>-9.698624126031063e-10</pre>
+<pre>-1.0622613899613498e-12</pre>
 </div>
 
 </div>
@@ -15372,7 +15315,7 @@ Backtracking not converging
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[201]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[67]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Value of the quadratic function evaluated at the optimal point.</span>
@@ -15392,13 +15335,13 @@ Backtracking not converging
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[201]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[67]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>-44.64089454531671</pre>
+<pre>-129.945114757688</pre>
 </div>
 
 </div>
@@ -15407,6 +15350,84 @@ Backtracking not converging
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We can then look at the optimal $w^*$ obtrained by
+\begin{equation*}
+    w^* = X^{\dagger} (y + v^*)
+\end{equation*}</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[68]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">w_star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">v_star</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Print the coefs of w_star &gt;= 1e-5</span>
+<span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">w_star</span> <span class="o">&gt;=</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">w_star</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[68]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>array([0.        , 0.01118423, 0.06979384, 0.        , 0.        ,
+       0.        , 0.13301761, 0.        , 0.20999201, 0.0149517 ,
+       0.        , 0.        , 0.        , 0.        , 0.09410407,
+       0.        , 0.        , 0.        , 0.        , 0.10858152,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.05109365, 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.45558223,
+       0.        , 0.07117971, 0.        , 1.44966444, 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ])</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We obtain a sparse vector, which is a good sign as it is the objective of a LASSO regression.</p>
+
+</div>
+</div>
+</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
@@ -15424,7 +15445,7 @@ Backtracking not converging
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[203]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[69]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">cvxpy</span> <span class="k">as</span> <span class="nn">cp</span>
@@ -15458,17 +15479,33 @@ Backtracking not converging
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[203]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[69]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>(-44.640894550003495,
- array([ 0.73181407, -0.84530778, -0.52563881, -2.35593478, -1.00330414,
-         0.71251306, -1.63990241, -0.39663129,  0.82584064, -1.04842948,
-        -1.0351969 ,  0.15396756, -0.92493194, -0.54019352, -0.10492113,
-         0.5674252 , -0.44287173,  0.32671034, -4.19676049, -1.57367555]))</pre>
+<pre>(-129.94511475773066,
+ array([ 0.31552562, -0.11703727,  0.01728237, -0.61737851, -0.99928907,
+         1.46258562, -0.42576194,  0.8568421 , -0.28038062, -0.56092876,
+        -0.65274369,  0.29339506,  0.31064405, -0.89736969, -1.7106127 ,
+        -1.21882627,  0.7451865 ,  1.78745409, -0.35292253, -1.38315793,
+        -0.26489221,  0.00563829,  0.3942802 , -0.00680659, -0.92309693,
+         0.06081644,  0.10674194,  1.11850177,  1.64766325,  0.70049316,
+         0.98543705, -0.52862293, -0.26416066, -1.50249411,  1.8282942 ,
+         0.3445711 ,  0.21621665, -1.34963551,  0.18589437,  1.17286416,
+        -0.1218349 ,  1.1707134 ,  0.61834599, -0.16522791,  0.31948091,
+         1.71364731,  0.81019719,  0.26572859,  0.38634092,  0.30676617,
+         0.10183189, -0.35887503, -1.8900325 ,  0.95092626,  0.13033911,
+        -2.07744882, -1.19539063, -2.35701503,  1.03831051, -0.12284202,
+        -0.11956244,  0.87448636, -0.02591839, -1.93634463, -1.33856515,
+        -1.25210765,  0.31492665, -1.22922936,  0.95031641, -0.89167381,
+        -0.64247143, -1.29265585, -0.16343546,  0.56648747,  1.06346221,
+        -1.40619349, -1.49697813,  0.13200218, -0.88739194, -0.80867504,
+         0.6736527 , -0.40367335,  0.48625451, -0.05944894,  0.1951453 ,
+         1.70126284,  1.40729699, -1.19444094,  0.06878788, -0.69743594,
+        -0.32995683, -0.12279312, -0.31907041, -0.72057493,  0.23273406,
+        -2.01483994,  1.09135349, -0.32760838,  1.08556586, -0.71555631]))</pre>
 </div>
 
 </div>
@@ -15484,7 +15521,7 @@ Backtracking not converging
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We can see that the found optimal values are really close, less than $5 \times 10^{-9}$.</p>
+<p>We can see that the found optimal values are really close, less than $5 \times 10^{-11}$.</p>
 
 </div>
 </div>
@@ -15494,7 +15531,7 @@ Backtracking not converging
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[205]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[70]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Difference between custom implementation and CVXPy</span>
@@ -15514,13 +15551,13 @@ Backtracking not converging
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[205]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[70]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>4.6867825176377664e-09</pre>
+<pre>4.2660985855036415e-11</pre>
 </div>
 
 </div>
@@ -15536,7 +15573,7 @@ Backtracking not converging
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>And the norm of the difference between the points is less than $5 \times 10^{-8}$.</p>
+<p>And the norm of the difference between the points is less than $2 \times 10^{-10}$.</p>
 
 </div>
 </div>
@@ -15546,7 +15583,7 @@ Backtracking not converging
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[206]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[71]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Difference between custom implementation and CVXPy</span>
@@ -15566,13 +15603,13 @@ Backtracking not converging
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[206]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[71]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>4.244096323079521e-08</pre>
+<pre>1.4601715730472986e-10</pre>
 </div>
 
 </div>
@@ -15598,7 +15635,7 @@ Backtracking not converging
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[207]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[72]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Pose the LASSO problem</span>
@@ -15613,7 +15650,7 @@ Backtracking not converging
 <span class="n">prob</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
 
 <span class="c1"># Optimal solution</span>
-<span class="n">prob</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">value</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">value</span><span class="o">&gt;=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -15629,26 +15666,23 @@ Backtracking not converging
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[207]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[72]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>(56.89234479583571,
- array([-1.22170091e-01,  2.33106305e-01,  3.05069133e-12,  9.95144039e-01,
-         4.30489640e-11, -1.49052417e-09,  7.70765039e-01, -3.69562834e-02,
-         4.50499297e-01,  6.39145197e-11, -1.76728545e-10, -2.69659959e-10,
-        -2.19494913e-10,  2.19467178e-10, -3.22221072e-10,  6.13117966e-01,
-        -7.98881058e-02,  2.67996097e-11, -1.27990539e-10,  1.62517184e-10,
-        -1.18188333e-10, -5.51384321e-02, -1.38765046e-10,  5.02293389e-09,
-         1.69297407e-11,  8.41264900e-11,  1.00744598e-09, -3.47707951e-10,
-        -1.25861671e-10,  2.78196906e-10, -1.29884686e-01,  4.31098148e-11,
-         2.31807852e-11,  2.80474347e-10,  2.87306996e-10, -1.35318009e-01,
-        -3.53974321e-10,  4.47161978e-11,  1.67566123e-10,  1.25711362e-08,
-        -9.53288255e-10,  3.32165358e-10,  2.46366077e-10,  3.86656620e-01,
-         8.09973212e-11, -7.08446043e-10,  1.82890079e-10,  6.72950570e-10,
-        -9.21521839e-11,  3.69660574e-10]))</pre>
+<pre>(167.183396521373,
+ array([0.        , 0.07926927, 0.13443537, 0.        , 0.00273   ,
+        0.        , 0.16170766, 0.        , 0.24259922, 0.08228944,
+        0.        , 0.        , 0.        , 0.        , 0.18405218,
+        0.        , 0.        , 0.        , 0.        , 0.18060557,
+        0.        , 0.        , 0.06113215, 0.        , 0.        ,
+        0.01934214, 0.03138581, 0.        , 0.09522368, 0.01020272,
+        0.        , 0.        , 0.        , 0.10223705, 0.03396465,
+        0.        , 0.        , 0.        , 0.        , 0.53192205,
+        0.01789768, 0.15245121, 0.        , 1.48752488, 0.        ,
+        0.        , 0.00382742, 0.11365801, 0.        , 0.        ]))</pre>
 </div>
 
 </div>
@@ -15657,6 +15691,66 @@ Backtracking not converging
 
 </div>
 
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[73]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">w_star</span><span class="o">&gt;=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">w_star</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[73]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>array([0.        , 0.01118423, 0.06979384, 0.        , 0.        ,
+       0.        , 0.13301761, 0.        , 0.20999201, 0.0149517 ,
+       0.        , 0.        , 0.        , 0.        , 0.09410407,
+       0.        , 0.        , 0.        , 0.        , 0.10858152,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.05109365, 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.45558223,
+       0.        , 0.07117971, 0.        , 1.44966444, 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ])</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We notice some differences between the solutions of the dual problem and the solution of the LASSO implemented by CVXPY. But, we still have the larger coefficients that are similar.</p>
+
+</div>
+</div>
+</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
@@ -15682,8 +15776,8 @@ The plots come from there.</p>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="Centering-step">Centering step<a class="anchor-link" href="#Centering-step">&#182;</a></h2><p>In this section, we will focus more on the centering step used on the objective function with $t=100$.</p>
-<p><img src="outputs/example_output_centering.png" alt="Centering step output" /></p>
-<center>Example output of a centering step for mu=10, t=100, alpha=0.1 and beta=0.5</center>
+<p>This are just the results obtained by a Newton method on the objective function with $\lambda=10$, $\mu=10$, $t=100$, $\alpha=0.1$ and $\beta=0.5$</p>
+<p><img src="outputs/example_output_centering-10.png" alt="Centering step output" /></p>
 <p>We clearly see the two parts of the method, as described in the course.</p>
 
 </div>
@@ -15696,7 +15790,8 @@ The plots come from there.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Other-example">Other example<a class="anchor-link" href="#Other-example">&#182;</a></h3><p>On another note, I also used this method on a 2D function, given as an example in the course, to plot the descent.</p>
+<h3 id="Other-example">Other example<a class="anchor-link" href="#Other-example">&#182;</a></h3><p>On another note, I also used this method and a basic gradient descent on a 2D function, given as an example in the course, to plot the descent.</p>
+<p>This is just a visual way to confirm that the method is working as intended.</p>
 <p><img src="outputs/comparaison_newton_gradient_4.png" alt="alt text" /></p>
 
 </div>
@@ -15709,8 +15804,11 @@ The plots come from there.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="Barrier-method">Barrier method<a class="anchor-link" href="#Barrier-method">&#182;</a></h2><p>This section presents results of the barrier method.</p>
-<p><img src="outputs/lasso_pb_outputs.png" alt="Barrier method results" /></p>
+<h2 id="Barrier-method">Barrier method<a class="anchor-link" href="#Barrier-method">&#182;</a></h2><p>This section presents results of the barrier method on the QP problem.</p>
+<p>We plot the dual gap between the optimal value of the dual problem and the value of the LASSO function.</p>
+<p><img src="outputs/lasso_pb_outputs_10.png" alt="Barrier method results" /></p>
+<p>We can see that the barrier method converged successfully. Furthermore, we observe that for small values of $\mu=2, 5$, many centering steps are needed, which also increases the number of Newton iterations.</p>
+<p>From this graph, we can suppose that $\mu=50$ is a sweetspot for this problem, as it only required 60 Newton iterations, where smaller values need a lot more, and bigger values tend to take longer as well.</p>
 
 </div>
 </div>

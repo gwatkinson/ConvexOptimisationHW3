@@ -164,7 +164,7 @@
     \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
     % Document parameters
     % Document title
-    \title{final}
+    \title{report}
     
     
     
@@ -617,237 +617,106 @@ squares :
     w^* = X^{\dagger}(y + v^*)
 \end{align*}
 
+    \hypertarget{summary}{%
+\subsection{Summary}\label{summary}}
+
+In the first section, we will display plots resuming the optimisation
+process, to have a quick look at the results.
+
+In a second section, we will look at some details of the implementation
+on generated data, and compare to results from CVXPY.
+
+Lastly, in a third section, we will explain the implementation details.
+
     \hypertarget{code-for-the-testing}{%
 \subsection{Code for the testing}\label{code-for-the-testing}}
 
 I decided to use Python to implement the testing on the data.
 
-The following code only a part of the total code I wrote to do this, I
-only kept the essential for readibility reasons. You can find the
-complete code on this GitHub repository:
+The following code (in the third section), is only a part of the total
+code I wrote to during this homework. I only kept the essential for
+readibility reasons.
+
+You can find the complete code on this GitHub repository:
 \url{https://github.com/gwatkinson/HW3}.
 
-    \hypertarget{rapid-implementation}{%
-\subsection{Rapid implementation}\label{rapid-implementation}}
+    \hypertarget{results}{%
+\subsection{Results}\label{results}}
 
-In this section, I implemented the mentioned function quite fast, and
-tested it on generated data.
+In this section, we will display plots resuming the optimisation
+process.
 
-    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{1}{\boxspacing}
-\begin{Verbatim}[commandchars=\\\{\}]
-\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+The code needed to generate the plot is not in this notebook. I wanted
+to get more familiar with Object Oriented Programming with Python, so I
+made a package that implements convex optimisation for this problem with
+classes. The plots come from there.
 
-\PY{k+kn}{from} \PY{n+nn}{typing} \PY{k+kn}{import} \PY{n}{Callable}
+I checked that the ouptuts were the same for a given dataset.
 
-\PY{n}{f\PYZus{}type} \PY{o}{=} \PY{n}{Callable}\PY{p}{[}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{]}\PY{p}{,} \PY{n+nb}{float}\PY{p}{]}
-\end{Verbatim}
-\end{tcolorbox}
+You can view the entire code of the package on this Github repository:
+\href{https://github.com/gwatkinson/HW3/tree/main/src}{https://github.com/gwatkinson/HW3}.
 
-    \hypertarget{defining-the-functions}{%
-\subsubsection{Defining the functions}\label{defining-the-functions}}
+And how the plots are generated in the notebook :
+\href{test.ipynb}{https://github.com/gwatkinson/HW3/blob/main/test.ipynb},
+in the last section.
 
-This cell defines the function of the problem, given the necessary
-matrices.
+    \hypertarget{centering-step}{%
+\subsubsection{Centering step}\label{centering-step}}
 
-    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{2}{\boxspacing}
-\begin{Verbatim}[commandchars=\\\{\}]
-\PY{k}{def} \PY{n+nf}{f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The original objective function f\PYZus{}0.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{k}{return} \PY{n}{v}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{Q} \PY{o}{@} \PY{n}{v} \PY{o}{+} \PY{n}{p}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}
+This are the results obtained by a Newton method on the objective
+function with \(\lambda=10\), \(\mu=10\), \(t=100\), \(\alpha=0.1\) and
+\(\beta=0.5\)
 
-\PY{k}{def} \PY{n+nf}{grad\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The gradient of f.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{k}{return} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{Q} \PY{o}{@} \PY{n}{v} \PY{o}{+} \PY{n}{p}
+\begin{figure}
+\centering
+\includegraphics{outputs/example_output_centering-10.png}
+\caption{Centering step output}
+\end{figure}
 
+We clearly see the two parts of the method, as described in the course.
 
-\PY{k}{def} \PY{n+nf}{hess\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The hessian of f.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{k}{return} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{Q}
+    \hypertarget{other-example}{%
+\paragraph{Other example}\label{other-example}}
 
+On another note, I also used this method and a basic gradient descent on
+a 2D function, given as an example in the course, to plot the descent.
 
-\PY{k}{def} \PY{n+nf}{g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The log affine constraints f\PYZus{}i.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{n}{ai} \PY{o}{=} \PY{n}{A}\PY{p}{[}\PY{n}{i}\PY{p}{,} \PY{p}{:}\PY{p}{]}
-    \PY{n}{bi} \PY{o}{=} \PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}
-    \PY{k}{return} \PY{n+nb}{float}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{nan\PYZus{}to\PYZus{}num}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{n}{np}\PY{o}{.}\PY{n}{log}\PY{p}{(}\PY{n}{bi} \PY{o}{\PYZhy{}} \PY{n}{ai}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}\PY{p}{)}\PY{p}{,} \PY{n}{nan}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{inf}\PY{p}{)}\PY{p}{)}
+This is just a visual way to confirm that the method is working as
+intended.
 
-\PY{k}{def} \PY{n+nf}{grad\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The gradient of the log affine constraints f\PYZus{}i.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{n}{ai} \PY{o}{=} \PY{n}{A}\PY{p}{[}\PY{n}{i}\PY{p}{,} \PY{p}{:}\PY{p}{]}
-    \PY{n}{bi} \PY{o}{=} \PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}
-    \PY{k}{return} \PY{n}{ai} \PY{o}{/} \PY{p}{(}\PY{n}{bi} \PY{o}{\PYZhy{}} \PY{n}{ai}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}\PY{p}{)}
+\begin{figure}
+\centering
+\includegraphics{outputs/comparaison_newton_gradient_4.png}
+\caption{alt text}
+\end{figure}
 
-\PY{k}{def} \PY{n+nf}{hess\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The hessian of the log affine constraints f\PYZus{}i.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{n}{ai} \PY{o}{=} \PY{n}{A}\PY{p}{[}\PY{n}{i}\PY{p}{,} \PY{p}{:}\PY{p}{]}
-    \PY{n}{bi} \PY{o}{=} \PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}
-    \PY{k}{return} \PY{n}{ai}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)} \PY{o}{@} \PY{n}{ai}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{o}{.}\PY{n}{T} \PY{o}{/} \PY{p}{(}\PY{n}{bi} \PY{o}{\PYZhy{}} \PY{n}{ai}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}\PY{p}{)} \PY{o}{*}\PY{o}{*} \PY{l+m+mi}{2}
+    \hypertarget{barrier-method}{%
+\subsubsection{Barrier method}\label{barrier-method}}
 
+This section presents results of the barrier method on the QP problem.
 
-\PY{k}{def} \PY{n+nf}{phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The log barrier function phi.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
-    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{p}{[}\PY{n}{g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{]}\PY{p}{)}
+We plot the dual gap between the optimal value of the dual problem and
+the value of the LASSO function.
 
+\begin{figure}
+\centering
+\includegraphics{outputs/lasso_pb_outputs_10.png}
+\caption{Barrier method results}
+\end{figure}
 
-\PY{k}{def} \PY{n+nf}{grad\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The gradient of the log barrier function.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
-    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{grad\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{0}\PY{p}{)}
+We can see that the barrier method converged successfully. Furthermore,
+we observe that for small values of \(\mu=2, 5\), many centering steps
+are needed, which also increases the number of Newton iterations.
 
+From this graph, we can suppose that \(\mu=50\) is a sweetspot for this
+problem, as it only required 60 Newton iterations, where smaller values
+need a lot more, and bigger values tend to take longer as well.
 
-\PY{k}{def} \PY{n+nf}{hess\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The hessian of the log barrier function.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
-    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{hess\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{0}\PY{p}{)}
+    \hypertarget{test-if-the-algorithms-on-the-data}{%
+\subsection{Test if the algorithms on the
+data}\label{test-if-the-algorithms-on-the-data}}
 
-\PY{k}{def} \PY{n+nf}{dual\PYZus{}func}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{y}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The dual function (the inf of the Lagragian).\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{k}{return} \PY{o}{\PYZhy{}} \PY{l+m+mf}{0.5} \PY{o}{*} \PY{n}{v}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v} \PY{o}{\PYZhy{}} \PY{n}{v}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{y}
-
-\PY{k}{def} \PY{n+nf}{lasso\PYZus{}func}\PY{p}{(}\PY{n}{w}\PY{p}{,} \PY{n}{X}\PY{p}{,} \PY{n}{y}\PY{p}{,} \PY{n}{ld}\PY{p}{)}\PY{p}{:}
-    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The lasso function.\PYZdq{}\PYZdq{}\PYZdq{}}
-    \PY{k}{return} \PY{l+m+mf}{0.5} \PY{o}{*} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{norm}\PY{p}{(}\PY{n}{X} \PY{o}{@} \PY{n}{w} \PY{o}{\PYZhy{}} \PY{n}{y}\PY{p}{)}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{+} \PY{n}{ld} \PY{o}{*} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{norm}\PY{p}{(}\PY{n}{w}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}
-
-\PY{k}{def} \PY{n+nf}{get\PYZus{}w\PYZus{}star}\PY{p}{(}\PY{n}{v\PYZus{}star}\PY{p}{,} \PY{n}{X}\PY{p}{,} \PY{n}{y}\PY{p}{)}\PY{p}{:}
-    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{lstsq}\PY{p}{(}\PY{n}{X}\PY{p}{,} \PY{n}{y} \PY{o}{+} \PY{n}{v\PYZus{}star}\PY{p}{,} \PY{n}{rcond}\PY{o}{=}\PY{k+kc}{None}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
-\end{Verbatim}
-\end{tcolorbox}
-
-    \hypertarget{algorithms}{%
-\subsubsection{Algorithms}\label{algorithms}}
-
-This cell implements the algorithms used for resolving the convex
-problem.
-
-We first define the \texttt{backtracking\_line\_search} abd the
-\texttt{newton\_method} that works on any function, given the gradient
-and hessian.
-
-Then, the \texttt{centering\_step}, just applies the newton method to
-the constrained quadratic problem.
-
-Lastly, the \texttt{barr\_method} implements the barrier method for a
-given \(\mu\).
-
-    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{3}{\boxspacing}
-\begin{Verbatim}[commandchars=\\\{\}]
-\PY{k}{def} \PY{n+nf}{newton\PYZus{}step}\PY{p}{(}\PY{n}{x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{)} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{:}
-    \PY{n}{step} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{n}{hess\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{)} \PY{o}{@} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}
-    \PY{k}{return} \PY{n}{step}
-
-\PY{k}{def} \PY{n+nf}{newton\PYZus{}decrement}\PY{p}{(}\PY{n}{x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{)} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n+nb}{float}\PY{p}{:}
-    \PY{n}{decrement} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{sqrt}\PY{p}{(}\PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)} \PY{o}{@} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{n}{hess\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{)} \PY{o}{@} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{)}
-    \PY{k}{return} \PY{n}{decrement}
-
-
-\PY{k}{def} \PY{n+nf}{backtracking\PYZus{}line\PYZus{}search}\PY{p}{(}
-    \PY{n}{x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,} \PY{n}{f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{delta\PYZus{}x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,}
-    \PY{n}{alpha}\PY{p}{:} \PY{n+nb}{float}\PY{p}{,} \PY{n}{beta}\PY{p}{:} \PY{n+nb}{float}\PY{p}{,} \PY{n}{verbose}\PY{p}{:} \PY{n+nb}{bool} \PY{o}{=} \PY{k+kc}{False}
-\PY{p}{)} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n+nb}{float}\PY{p}{:}
-    \PY{k}{assert} \PY{n}{alpha} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{o+ow}{and} \PY{n}{alpha} \PY{o}{\PYZlt{}} \PY{l+m+mi}{1} \PY{o}{/} \PY{l+m+mi}{2}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Alpha must be between 0 and 0.5}\PY{l+s+s2}{\PYZdq{}}
-    \PY{k}{assert} \PY{n}{beta} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{o+ow}{and} \PY{n}{beta} \PY{o}{\PYZlt{}} \PY{l+m+mi}{1}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Beta must be between 0 and 1}\PY{l+s+s2}{\PYZdq{}}
-
-    \PY{n}{t} \PY{o}{=} \PY{l+m+mi}{1}
-    \PY{n}{\PYZus{}} \PY{o}{=} \PY{l+m+mi}{0}
-    \PY{k}{while} \PY{n}{f}\PY{p}{(}\PY{n}{x} \PY{o}{+} \PY{n}{t} \PY{o}{*} \PY{n}{delta\PYZus{}x}\PY{p}{)} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{n}{f}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{+} \PY{n}{alpha} \PY{o}{*} \PY{n}{t} \PY{o}{*} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{@} \PY{n}{delta\PYZus{}x}\PY{p}{:}
-        \PY{n}{t} \PY{o}{*}\PY{o}{=} \PY{n}{beta}
-        \PY{n}{\PYZus{}} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}
-        \PY{k}{if} \PY{n}{\PYZus{}} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{l+m+mi}{100}\PY{p}{:}
-            \PY{k}{raise} \PY{n+ne}{ValueError}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Backtracking not converging}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
-        
-    \PY{k}{return} \PY{n}{t}
-
-\PY{k}{def} \PY{n+nf}{newton\PYZus{}method}\PY{p}{(}
-    \PY{n}{x0}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,}
-    \PY{n}{f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,}
-    \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,}
-    \PY{n}{hess\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,}
-    \PY{n}{epsilon}\PY{p}{:} \PY{n+nb}{float}\PY{p}{,}
-    \PY{n}{alpha}\PY{p}{:} \PY{n+nb}{float} \PY{o}{=} \PY{l+m+mf}{0.1}\PY{p}{,}
-    \PY{n}{beta}\PY{p}{:} \PY{n+nb}{float} \PY{o}{=} \PY{l+m+mf}{0.5}\PY{p}{,}
-    \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}
-\PY{p}{)}\PY{p}{:}
-
-    \PY{n}{x} \PY{o}{=} \PY{n}{x0}
-    \PY{n}{decrement} \PY{o}{=} \PY{n}{newton\PYZus{}decrement}\PY{p}{(}\PY{n}{x}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{)}
-
-    \PY{n}{xs} \PY{o}{=} \PY{p}{[}\PY{n}{x0}\PY{p}{]}
-    \PY{n}{decrements} \PY{o}{=} \PY{p}{[}\PY{n}{decrement}\PY{p}{]}
-    \PY{n}{steps} \PY{o}{=} \PY{p}{[}\PY{p}{]}
-    \PY{n}{ts} \PY{o}{=} \PY{p}{[}\PY{p}{]}
-
-    \PY{n}{\PYZus{}} \PY{o}{=} \PY{l+m+mi}{0}
-    \PY{k}{while} \PY{n}{decrement}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{/} \PY{l+m+mi}{2} \PY{o}{\PYZgt{}} \PY{n}{epsilon}\PY{p}{:}
-        \PY{k}{try}\PY{p}{:}
-            \PY{k}{if} \PY{n}{verbose}\PY{p}{:}
-                \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}t}\PY{l+s+s2}{Criterion: }\PY{l+s+si}{\PYZob{}}\PY{n}{decrement}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{l+s+si}{:}\PY{l+s+s2}{.4e}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
-            \PY{n}{decrement} \PY{o}{=} \PY{n}{newton\PYZus{}decrement}\PY{p}{(}\PY{n}{x}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{)}
-            \PY{n}{step} \PY{o}{=} \PY{n}{newton\PYZus{}step}\PY{p}{(}\PY{n}{x}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{)}
-            \PY{n}{t} \PY{o}{=} \PY{n}{backtracking\PYZus{}line\PYZus{}search}\PY{p}{(}
-                \PY{n}{x}\PY{p}{,} \PY{n}{f}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{step}\PY{p}{,} \PY{n}{alpha}\PY{p}{,} \PY{n}{beta}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{n}{verbose}
-            \PY{p}{)}
-            \PY{n}{x} \PY{o}{+}\PY{o}{=} \PY{n}{t} \PY{o}{*} \PY{n}{step}
-
-            \PY{n}{decrements}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{decrement}\PY{p}{)}
-            \PY{n}{steps}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{step}\PY{p}{)}
-            \PY{n}{ts}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{t}\PY{p}{)}
-            \PY{n}{xs}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{x}\PY{p}{)}
-
-            \PY{n}{\PYZus{}} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}
-            \PY{k}{if} \PY{n}{\PYZus{}} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{l+m+mi}{20}\PY{p}{:}
-                \PY{k}{raise} \PY{n+ne}{ValueError}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Newton method not converging}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
-            
-        \PY{k}{except} \PY{n+ne}{ValueError} \PY{k}{as} \PY{n}{e}\PY{p}{:}
-            \PY{k}{if} \PY{n}{verbose}\PY{p}{:}
-                \PY{n+nb}{print}\PY{p}{(}\PY{n}{e}\PY{p}{)}
-            \PY{k}{break}
-
-    \PY{k}{return} \PY{n}{x}\PY{p}{,} \PY{n}{f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{,} \PY{p}{\PYZob{}}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{xs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{xs}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{decrements}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{decrements}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{steps}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{steps}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ts}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{ts}\PY{p}{\PYZcb{}}
-
-\PY{k}{def} \PY{n+nf}{centering\PYZus{}step}\PY{p}{(}\PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{t}\PY{p}{,} \PY{n}{v0}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{n}{alpha}\PY{o}{=}\PY{l+m+mf}{0.1}\PY{p}{,} \PY{n}{beta}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}\PY{p}{:}
-    \PY{n}{x\PYZus{}opt}\PY{p}{,} \PY{n}{f\PYZus{}opt}\PY{p}{,} \PY{n}{iterates} \PY{o}{=} \PY{n}{newton\PYZus{}method}\PY{p}{(}
-        \PY{n}{x0}\PY{o}{=}\PY{n}{v0}\PY{p}{,}
-        \PY{n}{f}\PY{o}{=}\PY{k}{lambda} \PY{n}{v}\PY{p}{:} \PY{n}{t} \PY{o}{*} \PY{n}{f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)} \PY{o}{+} \PY{n}{phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{,}
-        \PY{n}{grad\PYZus{}f}\PY{o}{=}\PY{k}{lambda} \PY{n}{v}\PY{p}{:} \PY{n}{t} \PY{o}{*} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)} \PY{o}{+} \PY{n}{grad\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{,}
-        \PY{n}{hess\PYZus{}f}\PY{o}{=}\PY{k}{lambda} \PY{n}{v}\PY{p}{:} \PY{n}{t} \PY{o}{*} \PY{n}{hess\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)} \PY{o}{+} \PY{n}{hess\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{,}
-        \PY{n}{epsilon}\PY{o}{=}\PY{n}{eps}\PY{p}{,}
-        \PY{n}{alpha}\PY{o}{=}\PY{n}{alpha}\PY{p}{,}
-        \PY{n}{beta}\PY{o}{=}\PY{n}{beta}\PY{p}{,}
-        \PY{n}{verbose}\PY{o}{=}\PY{n}{verbose}
-    \PY{p}{)}
-
-    \PY{k}{return} \PY{n}{x\PYZus{}opt}\PY{p}{,} \PY{n}{f\PYZus{}opt}\PY{p}{,} \PY{n}{iterates}
-
-\PY{k}{def} \PY{n+nf}{barr\PYZus{}method}\PY{p}{(}\PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{v0}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{n}{t0}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{mu}\PY{o}{=}\PY{l+m+mi}{15}\PY{p}{,} \PY{n}{alpha}\PY{o}{=}\PY{l+m+mf}{0.1}\PY{p}{,} \PY{n}{beta}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}\PY{p}{:}
-    \PY{n}{t} \PY{o}{=} \PY{n}{t0}
-    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
-    \PY{n}{v} \PY{o}{=} \PY{n}{v0}
-    \PY{n}{vs} \PY{o}{=} \PY{p}{[}\PY{n}{v}\PY{p}{]}
-    \PY{n}{ts} \PY{o}{=} \PY{p}{[}\PY{n}{t}\PY{p}{]}
-    \PY{n}{l\PYZus{}x\PYZus{}opt} \PY{o}{=} \PY{p}{[}\PY{p}{]}
-    \PY{n}{l\PYZus{}f\PYZus{}opt} \PY{o}{=} \PY{p}{[}\PY{p}{]}
-    \PY{n}{l\PYZus{}iterates} \PY{o}{=} \PY{p}{[}\PY{p}{]}
-
-    \PY{k}{while} \PY{n}{m} \PY{o}{/} \PY{n}{t} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{n}{eps}\PY{p}{:}
-        \PY{k}{if} \PY{n}{verbose}\PY{p}{:}
-            \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{t = }\PY{l+s+si}{\PYZob{}}\PY{n}{t}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ and m/t = }\PY{l+s+si}{\PYZob{}}\PY{n}{m}\PY{o}{/}\PY{n}{t}\PY{l+s+si}{:}\PY{l+s+s2}{ .2e}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
-        \PY{n}{x\PYZus{}opt}\PY{p}{,} \PY{n}{f\PYZus{}opt}\PY{p}{,} \PY{n}{iterates} \PY{o}{=} \PY{n}{centering\PYZus{}step}\PY{p}{(}
-            \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{t}\PY{p}{,} \PY{n}{v}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{n}{alpha}\PY{p}{,} \PY{n}{beta}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{n}{verbose}
-        \PY{p}{)}
-        \PY{n}{v} \PY{o}{=} \PY{n}{iterates}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{xs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]}
-        \PY{n}{t} \PY{o}{*}\PY{o}{=} \PY{n}{mu}
-
-        \PY{n}{vs}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{v}\PY{p}{)}
-        \PY{n}{ts}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{t}\PY{p}{)}
-        \PY{n}{l\PYZus{}iterates}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{iterates}\PY{p}{)}
-
-    \PY{k}{return} \PY{n}{vs}\PY{p}{,} \PY{n}{ts}\PY{p}{,} \PY{n}{l\PYZus{}iterates}
-\end{Verbatim}
-\end{tcolorbox}
+This section tests the preceding function on generated data.
 
     \hypertarget{generating-the-data}{%
 \subsubsection{Generating the data}\label{generating-the-data}}
@@ -867,7 +736,7 @@ We can then define the other matrices of the problem \(Q\), \(p\), \(A\)
 and \(b\).
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{62}{\boxspacing}
+\prompt{In}{incolor}{ }{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{k}{def} \PY{n+nf}{generate\PYZus{}data}\PY{p}{(}\PY{n}{N}\PY{o}{=}\PY{l+m+mi}{100}\PY{p}{,} \PY{n}{D}\PY{o}{=}\PY{l+m+mi}{50}\PY{p}{,} \PY{n}{ld}\PY{o}{=}\PY{l+m+mi}{10}\PY{p}{,} \PY{n}{sigma}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{density}\PY{o}{=}\PY{l+m+mf}{0.2}\PY{p}{)}\PY{p}{:}
     \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Generates data matrix X and observations Y.}\PY{l+s+s2}{\PYZdq{}}
@@ -885,12 +754,6 @@ and \(b\).
     \PY{k}{return} \PY{n}{X}\PY{p}{,} \PY{n}{y}\PY{p}{,} \PY{n}{beta\PYZus{}star}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}
 \end{Verbatim}
 \end{tcolorbox}
-
-    \hypertarget{test-if-the-algorithms-on-the-data}{%
-\subsection{Test if the algorithms on the
-data}\label{test-if-the-algorithms-on-the-data}}
-
-This section tests the preceding function on generated data.
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
 \prompt{In}{incolor}{63}{\boxspacing}
@@ -913,6 +776,10 @@ This section tests the preceding function on generated data.
 \PY{n}{t0} \PY{o}{=} \PY{l+m+mi}{1}
 \end{Verbatim}
 \end{tcolorbox}
+
+    \hypertarget{running-the-optimization-on-this-dataset}{%
+\subsection{Running the optimization on this
+dataset}\label{running-the-optimization-on-this-dataset}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
 \prompt{In}{incolor}{64}{\boxspacing}
@@ -1190,75 +1057,227 @@ array([0.        , 0.01118423, 0.06979384, 0.        , 0.        ,
 the solution of the LASSO implemented by CVXPY. But, we still have the
 larger coefficients that are similar.
 
-    \hypertarget{results}{%
-\subsection{Results}\label{results}}
+    \hypertarget{rapid-implementation}{%
+\subsection{Rapid implementation}\label{rapid-implementation}}
 
-In this section, we will display plots resuming the optimisation
-process.
+In this section, I implemented the mentioned function quite fast, and
+tested it on generated data.
 
-The code implementing this is different from the functions above. I
-wanted to get more familiar with Object Oriented Programming with
-Python, so I made a package that implements the same method with
-classes. I checked that the ouptuts were the same for a given dataset.
-The plots come from there.
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
 
-You can view the entire code on this Github repository:
-\url{https://github.com/gwatkinson/HW3}.
+\PY{k+kn}{from} \PY{n+nn}{typing} \PY{k+kn}{import} \PY{n}{Callable}
 
-    \hypertarget{centering-step}{%
-\subsection{Centering step}\label{centering-step}}
+\PY{n}{f\PYZus{}type} \PY{o}{=} \PY{n}{Callable}\PY{p}{[}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{]}\PY{p}{,} \PY{n+nb}{float}\PY{p}{]}
+\end{Verbatim}
+\end{tcolorbox}
 
-In this section, we will focus more on the centering step used on the
-objective function with \(t=100\).
+    \hypertarget{defining-the-functions}{%
+\subsubsection{Defining the functions}\label{defining-the-functions}}
 
-This are just the results obtained by a Newton method on the objective
-function with \(\lambda=10\), \(\mu=10\), \(t=100\), \(\alpha=0.1\) and
-\(\beta=0.5\)
+This cell defines the function of the problem, given the necessary
+matrices.
 
-\begin{figure}
-\centering
-\includegraphics{outputs/example_output_centering-10.png}
-\caption{Centering step output}
-\end{figure}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{2}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The original objective function f\PYZus{}0.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{k}{return} \PY{n}{v}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{Q} \PY{o}{@} \PY{n}{v} \PY{o}{+} \PY{n}{p}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}
 
-We clearly see the two parts of the method, as described in the course.
+\PY{k}{def} \PY{n+nf}{grad\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The gradient of f.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{k}{return} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{Q} \PY{o}{@} \PY{n}{v} \PY{o}{+} \PY{n}{p}
 
-    \hypertarget{other-example}{%
-\subsubsection{Other example}\label{other-example}}
 
-On another note, I also used this method and a basic gradient descent on
-a 2D function, given as an example in the course, to plot the descent.
+\PY{k}{def} \PY{n+nf}{hess\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The hessian of f.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{k}{return} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{Q}
 
-This is just a visual way to confirm that the method is working as
-intended.
 
-\begin{figure}
-\centering
-\includegraphics{outputs/comparaison_newton_gradient_4.png}
-\caption{alt text}
-\end{figure}
+\PY{k}{def} \PY{n+nf}{g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The log affine constraints f\PYZus{}i.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{n}{ai} \PY{o}{=} \PY{n}{A}\PY{p}{[}\PY{n}{i}\PY{p}{,} \PY{p}{:}\PY{p}{]}
+    \PY{n}{bi} \PY{o}{=} \PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}
+    \PY{k}{return} \PY{n+nb}{float}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{nan\PYZus{}to\PYZus{}num}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{n}{np}\PY{o}{.}\PY{n}{log}\PY{p}{(}\PY{n}{bi} \PY{o}{\PYZhy{}} \PY{n}{ai}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}\PY{p}{)}\PY{p}{,} \PY{n}{nan}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{inf}\PY{p}{)}\PY{p}{)}
 
-    \hypertarget{barrier-method}{%
-\subsection{Barrier method}\label{barrier-method}}
+\PY{k}{def} \PY{n+nf}{grad\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The gradient of the log affine constraints f\PYZus{}i.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{n}{ai} \PY{o}{=} \PY{n}{A}\PY{p}{[}\PY{n}{i}\PY{p}{,} \PY{p}{:}\PY{p}{]}
+    \PY{n}{bi} \PY{o}{=} \PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}
+    \PY{k}{return} \PY{n}{ai} \PY{o}{/} \PY{p}{(}\PY{n}{bi} \PY{o}{\PYZhy{}} \PY{n}{ai}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}\PY{p}{)}
 
-This section presents results of the barrier method on the QP problem.
+\PY{k}{def} \PY{n+nf}{hess\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The hessian of the log affine constraints f\PYZus{}i.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{n}{ai} \PY{o}{=} \PY{n}{A}\PY{p}{[}\PY{n}{i}\PY{p}{,} \PY{p}{:}\PY{p}{]}
+    \PY{n}{bi} \PY{o}{=} \PY{n}{b}\PY{p}{[}\PY{n}{i}\PY{p}{]}
+    \PY{k}{return} \PY{n}{ai}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)} \PY{o}{@} \PY{n}{ai}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{o}{.}\PY{n}{T} \PY{o}{/} \PY{p}{(}\PY{n}{bi} \PY{o}{\PYZhy{}} \PY{n}{ai}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v}\PY{p}{)} \PY{o}{*}\PY{o}{*} \PY{l+m+mi}{2}
 
-We plot the dual gap between the optimal value of the dual problem and
-the value of the LASSO function.
 
-\begin{figure}
-\centering
-\includegraphics{outputs/lasso_pb_outputs_10.png}
-\caption{Barrier method results}
-\end{figure}
+\PY{k}{def} \PY{n+nf}{phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The log barrier function phi.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
+    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{p}{[}\PY{n}{g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{]}\PY{p}{)}
 
-We can see that the barrier method converged successfully. Furthermore,
-we observe that for small values of \(\mu=2, 5\), many centering steps
-are needed, which also increases the number of Newton iterations.
 
-From this graph, we can suppose that \(\mu=50\) is a sweetspot for this
-problem, as it only required 60 Newton iterations, where smaller values
-need a lot more, and bigger values tend to take longer as well.
+\PY{k}{def} \PY{n+nf}{grad\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The gradient of the log barrier function.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
+    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{grad\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{0}\PY{p}{)}
+
+
+\PY{k}{def} \PY{n+nf}{hess\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The hessian of the log barrier function.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
+    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{hess\PYZus{}g}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{0}\PY{p}{)}
+
+\PY{k}{def} \PY{n+nf}{dual\PYZus{}func}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{y}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The dual function (the inf of the Lagragian).\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{k}{return} \PY{o}{\PYZhy{}} \PY{l+m+mf}{0.5} \PY{o}{*} \PY{n}{v}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{v} \PY{o}{\PYZhy{}} \PY{n}{v}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{y}
+
+\PY{k}{def} \PY{n+nf}{lasso\PYZus{}func}\PY{p}{(}\PY{n}{w}\PY{p}{,} \PY{n}{X}\PY{p}{,} \PY{n}{y}\PY{p}{,} \PY{n}{ld}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}The lasso function.\PYZdq{}\PYZdq{}\PYZdq{}}
+    \PY{k}{return} \PY{l+m+mf}{0.5} \PY{o}{*} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{norm}\PY{p}{(}\PY{n}{X} \PY{o}{@} \PY{n}{w} \PY{o}{\PYZhy{}} \PY{n}{y}\PY{p}{)}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{+} \PY{n}{ld} \PY{o}{*} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{norm}\PY{p}{(}\PY{n}{w}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}
+
+\PY{k}{def} \PY{n+nf}{get\PYZus{}w\PYZus{}star}\PY{p}{(}\PY{n}{v\PYZus{}star}\PY{p}{,} \PY{n}{X}\PY{p}{,} \PY{n}{y}\PY{p}{)}\PY{p}{:}
+    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{lstsq}\PY{p}{(}\PY{n}{X}\PY{p}{,} \PY{n}{y} \PY{o}{+} \PY{n}{v\PYZus{}star}\PY{p}{,} \PY{n}{rcond}\PY{o}{=}\PY{k+kc}{None}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \hypertarget{algorithms}{%
+\subsubsection{Algorithms}\label{algorithms}}
+
+This cell implements the algorithms used for resolving the convex
+problem.
+
+We first define the \texttt{backtracking\_line\_search} abd the
+\texttt{newton\_method} that works on any function, given the gradient
+and hessian.
+
+Then, the \texttt{centering\_step}, just applies the newton method to
+the constrained quadratic problem.
+
+Lastly, the \texttt{barr\_method} implements the barrier method for a
+given \(\mu\).
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{newton\PYZus{}step}\PY{p}{(}\PY{n}{x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{)} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{:}
+    \PY{n}{step} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{n}{hess\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{)} \PY{o}{@} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}
+    \PY{k}{return} \PY{n}{step}
+
+\PY{k}{def} \PY{n+nf}{newton\PYZus{}decrement}\PY{p}{(}\PY{n}{x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{)} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n+nb}{float}\PY{p}{:}
+    \PY{n}{decrement} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{sqrt}\PY{p}{(}\PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)} \PY{o}{@} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{n}{hess\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{)} \PY{o}{@} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{)}
+    \PY{k}{return} \PY{n}{decrement}
+
+
+\PY{k}{def} \PY{n+nf}{backtracking\PYZus{}line\PYZus{}search}\PY{p}{(}
+    \PY{n}{x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,} \PY{n}{f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,} \PY{n}{delta\PYZus{}x}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,}
+    \PY{n}{alpha}\PY{p}{:} \PY{n+nb}{float}\PY{p}{,} \PY{n}{beta}\PY{p}{:} \PY{n+nb}{float}\PY{p}{,} \PY{n}{verbose}\PY{p}{:} \PY{n+nb}{bool} \PY{o}{=} \PY{k+kc}{False}
+\PY{p}{)} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n+nb}{float}\PY{p}{:}
+    \PY{k}{assert} \PY{n}{alpha} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{o+ow}{and} \PY{n}{alpha} \PY{o}{\PYZlt{}} \PY{l+m+mi}{1} \PY{o}{/} \PY{l+m+mi}{2}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Alpha must be between 0 and 0.5}\PY{l+s+s2}{\PYZdq{}}
+    \PY{k}{assert} \PY{n}{beta} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{o+ow}{and} \PY{n}{beta} \PY{o}{\PYZlt{}} \PY{l+m+mi}{1}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Beta must be between 0 and 1}\PY{l+s+s2}{\PYZdq{}}
+
+    \PY{n}{t} \PY{o}{=} \PY{l+m+mi}{1}
+    \PY{n}{\PYZus{}} \PY{o}{=} \PY{l+m+mi}{0}
+    \PY{k}{while} \PY{n}{f}\PY{p}{(}\PY{n}{x} \PY{o}{+} \PY{n}{t} \PY{o}{*} \PY{n}{delta\PYZus{}x}\PY{p}{)} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{n}{f}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{+} \PY{n}{alpha} \PY{o}{*} \PY{n}{t} \PY{o}{*} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{@} \PY{n}{delta\PYZus{}x}\PY{p}{:}
+        \PY{n}{t} \PY{o}{*}\PY{o}{=} \PY{n}{beta}
+        \PY{n}{\PYZus{}} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}
+        \PY{k}{if} \PY{n}{\PYZus{}} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{l+m+mi}{100}\PY{p}{:}
+            \PY{k}{raise} \PY{n+ne}{ValueError}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Backtracking not converging}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        
+    \PY{k}{return} \PY{n}{t}
+
+\PY{k}{def} \PY{n+nf}{newton\PYZus{}method}\PY{p}{(}
+    \PY{n}{x0}\PY{p}{:} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{,}
+    \PY{n}{f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,}
+    \PY{n}{grad\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,}
+    \PY{n}{hess\PYZus{}f}\PY{p}{:} \PY{n}{f\PYZus{}type}\PY{p}{,}
+    \PY{n}{epsilon}\PY{p}{:} \PY{n+nb}{float}\PY{p}{,}
+    \PY{n}{alpha}\PY{p}{:} \PY{n+nb}{float} \PY{o}{=} \PY{l+m+mf}{0.1}\PY{p}{,}
+    \PY{n}{beta}\PY{p}{:} \PY{n+nb}{float} \PY{o}{=} \PY{l+m+mf}{0.5}\PY{p}{,}
+    \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}
+\PY{p}{)}\PY{p}{:}
+
+    \PY{n}{x} \PY{o}{=} \PY{n}{x0}
+    \PY{n}{decrement} \PY{o}{=} \PY{n}{newton\PYZus{}decrement}\PY{p}{(}\PY{n}{x}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{)}
+
+    \PY{n}{xs} \PY{o}{=} \PY{p}{[}\PY{n}{x0}\PY{p}{]}
+    \PY{n}{decrements} \PY{o}{=} \PY{p}{[}\PY{n}{decrement}\PY{p}{]}
+    \PY{n}{steps} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+    \PY{n}{ts} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+
+    \PY{n}{\PYZus{}} \PY{o}{=} \PY{l+m+mi}{0}
+    \PY{k}{while} \PY{n}{decrement}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{/} \PY{l+m+mi}{2} \PY{o}{\PYZgt{}} \PY{n}{epsilon}\PY{p}{:}
+        \PY{k}{try}\PY{p}{:}
+            \PY{k}{if} \PY{n}{verbose}\PY{p}{:}
+                \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}t}\PY{l+s+s2}{Criterion: }\PY{l+s+si}{\PYZob{}}\PY{n}{decrement}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{l+s+si}{:}\PY{l+s+s2}{.4e}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+            \PY{n}{decrement} \PY{o}{=} \PY{n}{newton\PYZus{}decrement}\PY{p}{(}\PY{n}{x}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{)}
+            \PY{n}{step} \PY{o}{=} \PY{n}{newton\PYZus{}step}\PY{p}{(}\PY{n}{x}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{hess\PYZus{}f}\PY{p}{)}
+            \PY{n}{t} \PY{o}{=} \PY{n}{backtracking\PYZus{}line\PYZus{}search}\PY{p}{(}
+                \PY{n}{x}\PY{p}{,} \PY{n}{f}\PY{p}{,} \PY{n}{grad\PYZus{}f}\PY{p}{,} \PY{n}{step}\PY{p}{,} \PY{n}{alpha}\PY{p}{,} \PY{n}{beta}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{n}{verbose}
+            \PY{p}{)}
+            \PY{n}{x} \PY{o}{+}\PY{o}{=} \PY{n}{t} \PY{o}{*} \PY{n}{step}
+
+            \PY{n}{decrements}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{decrement}\PY{p}{)}
+            \PY{n}{steps}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{step}\PY{p}{)}
+            \PY{n}{ts}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{t}\PY{p}{)}
+            \PY{n}{xs}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{x}\PY{p}{)}
+
+            \PY{n}{\PYZus{}} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}
+            \PY{k}{if} \PY{n}{\PYZus{}} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{l+m+mi}{20}\PY{p}{:}
+                \PY{k}{raise} \PY{n+ne}{ValueError}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Newton method not converging}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+            
+        \PY{k}{except} \PY{n+ne}{ValueError} \PY{k}{as} \PY{n}{e}\PY{p}{:}
+            \PY{k}{if} \PY{n}{verbose}\PY{p}{:}
+                \PY{n+nb}{print}\PY{p}{(}\PY{n}{e}\PY{p}{)}
+            \PY{k}{break}
+
+    \PY{k}{return} \PY{n}{x}\PY{p}{,} \PY{n}{f}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{,} \PY{p}{\PYZob{}}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{xs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{xs}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{decrements}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{decrements}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{steps}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{steps}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ts}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{n}{ts}\PY{p}{\PYZcb{}}
+
+\PY{k}{def} \PY{n+nf}{centering\PYZus{}step}\PY{p}{(}\PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{t}\PY{p}{,} \PY{n}{v0}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{n}{alpha}\PY{o}{=}\PY{l+m+mf}{0.1}\PY{p}{,} \PY{n}{beta}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}\PY{p}{:}
+    \PY{n}{x\PYZus{}opt}\PY{p}{,} \PY{n}{f\PYZus{}opt}\PY{p}{,} \PY{n}{iterates} \PY{o}{=} \PY{n}{newton\PYZus{}method}\PY{p}{(}
+        \PY{n}{x0}\PY{o}{=}\PY{n}{v0}\PY{p}{,}
+        \PY{n}{f}\PY{o}{=}\PY{k}{lambda} \PY{n}{v}\PY{p}{:} \PY{n}{t} \PY{o}{*} \PY{n}{f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)} \PY{o}{+} \PY{n}{phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{,}
+        \PY{n}{grad\PYZus{}f}\PY{o}{=}\PY{k}{lambda} \PY{n}{v}\PY{p}{:} \PY{n}{t} \PY{o}{*} \PY{n}{grad\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)} \PY{o}{+} \PY{n}{grad\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{,}
+        \PY{n}{hess\PYZus{}f}\PY{o}{=}\PY{k}{lambda} \PY{n}{v}\PY{p}{:} \PY{n}{t} \PY{o}{*} \PY{n}{hess\PYZus{}f}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{)} \PY{o}{+} \PY{n}{hess\PYZus{}phi}\PY{p}{(}\PY{n}{v}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{)}\PY{p}{,}
+        \PY{n}{epsilon}\PY{o}{=}\PY{n}{eps}\PY{p}{,}
+        \PY{n}{alpha}\PY{o}{=}\PY{n}{alpha}\PY{p}{,}
+        \PY{n}{beta}\PY{o}{=}\PY{n}{beta}\PY{p}{,}
+        \PY{n}{verbose}\PY{o}{=}\PY{n}{verbose}
+    \PY{p}{)}
+
+    \PY{k}{return} \PY{n}{x\PYZus{}opt}\PY{p}{,} \PY{n}{f\PYZus{}opt}\PY{p}{,} \PY{n}{iterates}
+
+\PY{k}{def} \PY{n+nf}{barr\PYZus{}method}\PY{p}{(}\PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{v0}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{n}{t0}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{mu}\PY{o}{=}\PY{l+m+mi}{15}\PY{p}{,} \PY{n}{alpha}\PY{o}{=}\PY{l+m+mf}{0.1}\PY{p}{,} \PY{n}{beta}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}\PY{p}{:}
+    \PY{n}{t} \PY{o}{=} \PY{n}{t0}
+    \PY{n}{m} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{b}\PY{p}{)}
+    \PY{n}{v} \PY{o}{=} \PY{n}{v0}
+    \PY{n}{vs} \PY{o}{=} \PY{p}{[}\PY{n}{v}\PY{p}{]}
+    \PY{n}{ts} \PY{o}{=} \PY{p}{[}\PY{n}{t}\PY{p}{]}
+    \PY{n}{l\PYZus{}x\PYZus{}opt} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+    \PY{n}{l\PYZus{}f\PYZus{}opt} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+    \PY{n}{l\PYZus{}iterates} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+
+    \PY{k}{while} \PY{n}{m} \PY{o}{/} \PY{n}{t} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{n}{eps}\PY{p}{:}
+        \PY{k}{if} \PY{n}{verbose}\PY{p}{:}
+            \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{t = }\PY{l+s+si}{\PYZob{}}\PY{n}{t}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ and m/t = }\PY{l+s+si}{\PYZob{}}\PY{n}{m}\PY{o}{/}\PY{n}{t}\PY{l+s+si}{:}\PY{l+s+s2}{ .2e}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        \PY{n}{x\PYZus{}opt}\PY{p}{,} \PY{n}{f\PYZus{}opt}\PY{p}{,} \PY{n}{iterates} \PY{o}{=} \PY{n}{centering\PYZus{}step}\PY{p}{(}
+            \PY{n}{Q}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{A}\PY{p}{,} \PY{n}{b}\PY{p}{,} \PY{n}{t}\PY{p}{,} \PY{n}{v}\PY{p}{,} \PY{n}{eps}\PY{p}{,} \PY{n}{alpha}\PY{p}{,} \PY{n}{beta}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{n}{verbose}
+        \PY{p}{)}
+        \PY{n}{v} \PY{o}{=} \PY{n}{iterates}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{xs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]}
+        \PY{n}{t} \PY{o}{*}\PY{o}{=} \PY{n}{mu}
+
+        \PY{n}{vs}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{v}\PY{p}{)}
+        \PY{n}{ts}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{t}\PY{p}{)}
+        \PY{n}{l\PYZus{}iterates}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{iterates}\PY{p}{)}
+
+    \PY{k}{return} \PY{n}{vs}\PY{p}{,} \PY{n}{ts}\PY{p}{,} \PY{n}{l\PYZus{}iterates}
+\end{Verbatim}
+\end{tcolorbox}
 
 
     % Add a bibliography block to the postdoc
