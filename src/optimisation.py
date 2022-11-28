@@ -3,11 +3,14 @@
 from __future__ import absolute_import
 
 import matplotlib.pyplot as plt
+import seaborn as sns
+import cvxpy as cp
 import numpy as np
 
 from src.custom_types import Line, Vector
 from src.function_helper import FunctionHelper, LogBarrier, Quadratic
 
+from tqdm import tqdm
 
 class UnconstrainedOptimizer:
     """Unconstrained optimizer."""
@@ -20,8 +23,8 @@ class UnconstrainedOptimizer:
         method="newton",
         alpha=0.4,
         beta=0.6,
-        error=1e-10,
-        epsilon=1e-14,
+        error=1e-8,
+        epsilon=0,
         max_iter=100,
         max_t_iter=100
     ):
@@ -111,13 +114,17 @@ class UnconstrainedOptimizer:
 
         self.iter_t = 0
         while line_func(t) - alpha_tangent(t) >= self.epsilon:
-            t *= beta
-            ts.append(t)
-            self.iter_t += 1
-            if self.iter_t >= self.max_t_iter:
-                self.backtracking_t = ts
-                self.t = t
-                raise ValueError("Backtracking line search not converging.")
+            try:
+                t *= beta
+                ts.append(t)
+                self.iter_t += 1
+                if self.iter_t >= self.max_t_iter:
+                    self.backtracking_t = ts
+                    self.t = t
+                    raise ValueError("Backtracking line search not converging.")
+            except ValueError as e:
+                # print(e)
+                raise ValueError()
 
         self.backtracking_t = ts
         self.t = t
@@ -191,7 +198,7 @@ class UnconstrainedOptimizer:
             yscale="log",
             title="Stopping criterion",
         )
-        ax.plot(xticks, self.stop_criterions, **kwargs)
+        ax.plot(xticks, self.stop_criterions, marker='o', **kwargs)
 
     def plot_gap(self, ax=None, **kwargs):
         """Plot the evolution of the gap."""
@@ -205,7 +212,7 @@ class UnconstrainedOptimizer:
             yscale="log",
             title="Gap to $p^*$",
         )
-        ax.plot(xticks, gap, **kwargs)
+        ax.plot(xticks, gap, marker='o', **kwargs)
 
     def plot_direction_norm(self, ax=None, **kwargs):
         """Plot the evolution of the direction norm."""
@@ -219,7 +226,7 @@ class UnconstrainedOptimizer:
             yscale="log",
             title="Norm of the directions",
         )
-        ax.plot(xticks, step, **kwargs)
+        ax.plot(xticks, step, marker='o', **kwargs)
 
     def plot_step_size(self, ax=None, **kwargs):
         """Plot the evolution of the step size."""
@@ -233,7 +240,7 @@ class UnconstrainedOptimizer:
             xticks=xticks,
             title="Step size",
         )
-        ax.plot(xticks, step, **kwargs)
+        ax.plot(xticks, step, marker='o', **kwargs)
 
     def plot_ouptuts(self, **kwargs):
         """Create a figure with all the previous plots."""
@@ -273,8 +280,8 @@ class BarrierMethod:
         t0,
         mu,
         centering_kwargs,
-        error=1e-10,
-        tol=1e-14
+        error=1e-8,
+        tol=0
     ):
         """Initiate the optimizer."""
         self.func = func
@@ -296,6 +303,7 @@ class BarrierMethod:
         self.center_f = None
         self.center_pb = None
         self.number_centering_step = None
+        self.total_newton_steps = None
         
         self.xs = [self.x]
         self.ys = [self.y]
@@ -337,6 +345,7 @@ class BarrierMethod:
         self.update_lists()
         self.update_t()
         self.iter += 1
+        self.total_newton_steps = sum(self.number_centering_steps)
         
     def optimise(self, error=None, verbose=False):
         """Optimise the problem."""
@@ -347,21 +356,74 @@ class BarrierMethod:
                 if verbose:
                     print(f"Step {self.iter}:")
                     print(f"\t Criterion = {self.stop_criterion:.2e}")
-                    print(f"\t y_{self.iter} = {self.y:.2g}")
-                    print(f"\t Centering step final criterion = {self.center_pb.stop_criterion:.2g}")
+                    print(f"\t y_{self.iter} = {self.y:.6g}")
+                    print(f"\t Centering step final criterion = {self.center_pb.stop_criterion:.6g}")
                     print(f"\t Number of steps in centering = {self.number_centering_step}")
             except ValueError as e:
                 print("Centering step not converging")
                 print(e)
                 break
+    
+    # Plotting functions
+    def plot_criterion(self, ax=None, **kwargs):
+        """Plot the evolution of the criterion."""
+        ax = ax or plt.gca()
+        xticks = list(range(len(self.stop_criterions)))
+        ax.set(
+            xlabel="Iteration",
+            ylabel="Stop criterion",
+            xticks=xticks,
+            yscale="log",
+            title="Stopping criterion",
+        )
+        ax.plot(xticks, self.stop_criterions, marker='o', **kwargs)
+
+    def plot_gap(self, ax=None, **kwargs):
+        """Plot the evolution of the gap."""
+        ax = ax or plt.gca()
+        gap = np.array(self.ys) - np.min(np.array(self.ys))
+        xticks = list(range(1, len(gap) + 1))
+        ax.set(
+            xlabel="$k$",
+            ylabel=r"$f(x^{(k)}) - p^*$",
+            xticks=xticks,
+            yscale="log",
+            title="Gap to $p^*$",
+        )
+        ax.plot(xticks, gap, marker='o', **kwargs)
         
+    def plot_number_centering_steps(self, ax=None, **kwargs):
+        """Plot the evolution of the gap."""
+        ax = ax or plt.gca()
+        steps = np.array(self.number_centering_steps)
+        xticks = np.arange(1, len(steps) + 1)
+        yticks = np.arange(np.max(steps)+1)
+        ax.set(
+            xlabel="Iteration",
+            ylabel="Number of steps",
+            xticks=xticks,
+            yticks=yticks,
+            title="Number of newton steps in centering problem",
+        )
+        ax.plot(xticks, steps, marker='o', **kwargs)
+
+    def plot_ouptuts(self, figsize=None, **kwargs):
+        """Create a figure with all the previous plots."""
+        fig, axs = plt.subplots(3, 1, figsize=figsize)
+        fig.suptitle("Results of the optimisation steps")
+        
+        self.plot_criterion(ax=axs[0], **kwargs)
+        self.plot_gap(ax=axs[1], **kwargs)
+        self.plot_number_centering_steps(ax=axs[2], **kwargs)
+        fig.tight_layout()
+        return fig
         
 class QuadraticBarrierMethod(BarrierMethod):
     """Barrier method for a quadratic function."""
     
     def __init__(
         self,
-        Q, p, A, b, x0, t0, mu, centering_kwargs, error=1e-10, tol=1e-14
+        Q, p, A, b, x0, t0, mu, centering_kwargs, error=1e-8, tol=0
     ):
         """Initiate a quadratic function and the associated barrier method."""
         self.Q = Q
@@ -379,3 +441,191 @@ class QuadraticBarrierMethod(BarrierMethod):
             error,
             tol
         )
+
+
+class LASSOProblem:
+    def __init__(self, X, y, ld):
+        self.X = X
+        self.y = y
+        self.ld = ld
+        self.n = X.shape[0]
+        self.d = X.shape[1]
+        self.m = 2 * self.d
+        self.Q = 0.5 * np.identity(self.n)
+        self.p = self.y
+        self.A = np.vstack([self.X.T, -self.X.T])
+        self.b = ld * np.ones(self.m)
+
+        self.lasso_func = lambda w: 0.5 * np.linalg.norm(X @ w - y)**2 + ld * np.linalg.norm(w, 1)
+        self.cvxpy_lasso_func = lambda w: 0.5 * cp.norm2(X @ w - y)**2 + ld * cp.norm1(w)
+        self.dual_func = lambda v: - 0.5 * np.linalg.norm(v)**2 - v.T @ y
+
+        self.v_stars = []
+        self.v_star = None
+        self.w_stars = []
+        self.w_star = None
+        self.final_criterions = []
+        self.final_criterion = None
+        self.pbs = []
+        self.pb = None
+        self.mus = []
+        self.mu = None
+        
+        self.cvxpy_pb = None
+        self.cvxpy_x = None
+        self.cvxpy_y = None
+        self.x_diff = None
+        self.y_diff = None
+        self.cvxpy_w_stars = []
+        self.cvxpy_w_star = None
+        
+        self.results = None
+        
+    
+    def initialise_dual_problem(self, x0, t0, mu, centering_kwargs, error=1e-10, tol=0, **kwargs):
+        self.pb = QuadraticBarrierMethod(
+            Q=self.Q,
+            p=self.p,
+            A=self.A,
+            b=self.b,
+            x0=x0,
+            t0=t0,
+            mu=mu,
+            centering_kwargs=centering_kwargs,
+            error=error,
+            tol=tol
+        )
+        self.mu = mu
+        self.mus.append(self.pb.mu)        
+    
+        self.pb.optimise(**kwargs)
+        self.pbs.append(self.pb)
+        
+        self.v_star = self.pb.x
+        self.v_stars.append(self.v_star)
+        self.final_criterion = self.pb.stop_criterion
+        self.final_criterions.append(self.final_criterion)
+    
+    def calculate_dual_gap(self, pb=None):
+        pb = pb or self.pb
+        gaps = []
+        for v in pb.xs:
+            w = self.get_w_star_from_v(v)
+            fval = self.lasso_func(w)
+            gval = self.dual_func(v)
+            gap = fval - gval
+            gaps.append(gap)
+            steps = pb.number_centering_steps
+        return gaps, steps
+    
+    def get_number_newton_steps(self, pb=None):
+        pb = pb or self.pb
+        return sum(pb.number_centering_steps)
+        
+    
+    def get_w_star(self):
+        self.w_star = np.linalg.lstsq(self.X, self.y + self.v_star, rcond=None)
+        self.w_stars.append(self.w_star)
+        return self.w_star[0]
+    
+    def get_w_star_from_v(self, v):
+        w_star = np.linalg.lstsq(self.X, self.y + v, rcond=None)
+        return w_star[0] 
+
+    def cvxpy_solution(self):
+        print("Solving with CVXPY..")
+        x = cp.Variable(self.n)
+        prob = cp.Problem(cp.Minimize(cp.quad_form(x, self.Q) + self.p.T @ x),
+                        [self.A @ x <= self.b])
+        prob.solve()
+        self.cvxpy_x = x.value
+        self.cvxpy_y = prob.value
+        self.cvxpy_pb = prob
+        print(f"Optimal value: {self.cvxpy_y:.4f}")
+    
+    def compare_with_cvxpy(self):
+        self.x_diff = np.linalg.norm(self.cvxpy_x - self.v_star)
+        self.y_diff = np.abs(self.cvxpy_y - self.pb.y)
+        return self.x_diff, self.y_diff
+        
+    def get_cvxpy_w_star(self):
+        self.cvxpy_w_star = np.linalg.lstsq(self.X, self.y + self.cvxpy_x, rcond=None)
+        self.cvxpy_w_stars.append(self.w_star)
+        return self.w_star[0]
+    
+    def try_mus(self, mus, x0, t0, centering_kwargs, error=1e-10, tol=0, **kwargs):
+        results = {}
+        for mu in (pbar := tqdm(mus)):
+            pbar.set_postfix_str(f"mu={mu}")
+            self.initialise_dual_problem(x0, t0, mu, centering_kwargs, error=1e-10, tol=0, **kwargs)
+            gaps, steps = self.calculate_dual_gap()
+            total_steps = self.get_number_newton_steps()
+            centering_criterions = self.pb.stop_criterions
+            results[mu] = {
+                "gaps": gaps,
+                "steps": steps,
+                "total_steps": total_steps,
+                "stop_criterions": centering_criterions,
+                
+            }
+        self.results = results
+        return results
+
+
+    def calculate_results_from_pb_lists(self):
+        results = {}
+        for pb in (pbar := tqdm(self.pbs)):
+            pbar.set_postfix_str(f"mu={pb.mu}")
+            gaps, steps = self.calculate_dual_gap(pb=pb)
+            total_steps = self.get_number_newton_steps(pb=pb)
+            centering_criterions = pb.stop_criterions
+            results[pb.mu] = {
+                "gaps": gaps,
+                "steps": steps,
+                "total_steps": total_steps,
+                "stop_criterions": centering_criterions,
+            }
+        self.results = results
+        return results
+
+    def plot_results(self, submus=None, figsize=None, **kwargs):
+        fig, axs = plt.subplots(2, 1, figsize=figsize)
+        
+        mus = self.results.keys()
+        submus = submus or mus
+        total_steps = [self.results[mu]['total_steps'] for mu in mus]
+        
+        colors = sns.color_palette("Set1")
+        
+        for i, mu in enumerate(submus):
+            gaps = np.array(self.results[mu]['gaps'])
+            steps = np.array([0] + self.results[mu]['steps'])
+            cum_steps = np.cumsum(steps)
+            
+            axs[0].step(
+                cum_steps,
+                gaps,
+                label=rf"$\mu={mu}$",
+                color=colors[i],
+                **kwargs
+            )
+            
+        axs[0].set(
+            xlabel='Newton iterations',
+            ylabel='Duality gap',
+            yscale='log',
+            title=r'Evolution of the duality',
+        )
+        
+        axs[1].plot(mus, total_steps, marker='o', **kwargs)
+        axs[1].set(
+            xlabel=r'$\mu$',
+            ylabel='Newton iterations',
+            title=r'Number of Newton iterations'
+        )
+        
+        fig.suptitle('Results of the Lasso problem')        
+        fig.tight_layout()
+        axs[0].legend()
+
+        return fig
