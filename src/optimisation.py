@@ -114,17 +114,13 @@ class UnconstrainedOptimizer:
 
         self.iter_t = 0
         while line_func(t) - alpha_tangent(t) >= self.epsilon:
-            try:
-                t *= beta
-                ts.append(t)
-                self.iter_t += 1
-                if self.iter_t >= self.max_t_iter:
-                    self.backtracking_t = ts
-                    self.t = t
-                    raise ValueError("Backtracking line search not converging.")
-            except ValueError as e:
-                # print(e)
-                raise ValueError()
+            t *= beta
+            ts.append(t)
+            self.iter_t += 1
+            if self.iter_t >= self.max_t_iter:
+                self.backtracking_t = ts
+                self.t = t
+                raise ValueError("Backtracking line search not converging.")
 
         self.backtracking_t = ts
         self.t = t
@@ -309,15 +305,18 @@ class BarrierMethod:
         self.center_pb = UnconstrainedOptimizer(self.center_f, self.x, **self.kwargs)
 
     def optimise_centering_problem(self):
+        """Optimise the current centering problem."""
         self.center_pb.optimise()
         self.number_centering_step = self.center_pb.iter
 
     def centering_step(self):
+        """Update the current optimal point and the criterion."""
         self.x = self.center_pb.x
         self.y = self.func(self.x)
         self.stop_criterion = self.m / self.t
 
     def update_lists(self):
+        """Update the iterate lists of the problem."""
         self.xs.append(self.x)
         self.ys.append(self.y)
         self.ts.append(self.t)
@@ -326,9 +325,11 @@ class BarrierMethod:
         self.number_centering_steps.append(self.number_centering_step)
 
     def update_t(self):
+        """Update the current t."""
         self.t *= self.mu
 
     def optimisation_step(self):
+        """Optimisation step."""
         self.update_centering_function()
         self.optimise_centering_problem()
         self.centering_step()
@@ -417,7 +418,9 @@ class BarrierMethod:
 class QuadraticBarrierMethod(BarrierMethod):
     """Barrier method for a quadratic function."""
 
-    def __init__(self, Q, p, A, b, x0, t0, mu, centering_kwargs, error=1e-8, tol=0):
+    def __init__(
+        self, Q, p, A, b, x0, t0, mu, centering_kwargs, error=1e-8, tol=0
+        ):
         """Initiate a quadratic function and the associated barrier method."""
         self.Q = Q
         self.p = p
@@ -473,6 +476,7 @@ class LASSOProblem:
     def initialise_dual_problem(
         self, x0, t0, mu, centering_kwargs, error=1e-10, tol=0, **kwargs
     ):
+        """Initialise and optimise the dual problem for the given mu."""
         self.pb = QuadraticBarrierMethod(
             Q=self.Q,
             p=self.p,
@@ -497,6 +501,7 @@ class LASSOProblem:
         self.final_criterions.append(self.final_criterion)
 
     def calculate_dual_gap(self, pb=None):
+        """Get the dual gaps of the problem."""
         pb = pb or self.pb
         gaps = []
         for v in pb.xs:
@@ -509,20 +514,24 @@ class LASSOProblem:
         return gaps, steps
 
     def get_number_newton_steps(self, pb=None):
+        """Get the number of newton steps of the problem."""
         pb = pb or self.pb
         return sum(pb.number_centering_steps)
 
     def get_w_star(self):
+        """Get w_star from the current optimal point."""
         self.w_star = np.linalg.lstsq(self.X, self.y + self.v_star, rcond=None)
         self.w_stars.append(self.w_star)
         return self.w_star[0]
 
     def get_w_star_from_v(self, v):
+        """Get the w_star from the given v."""
         w_star = np.linalg.lstsq(self.X, self.y + v, rcond=None)
         return w_star[0]
 
     def cvxpy_solution(self):
-        print("Solving with CVXPY..")
+        """Solve the dual problem with CVXPY."""
+        print("Solving with CVXPY...")
         x = cp.Variable(self.n)
         prob = cp.Problem(
             cp.Minimize(cp.quad_form(x, self.Q) + self.p.T @ x), [self.A @ x <= self.b]
@@ -534,21 +543,24 @@ class LASSOProblem:
         print(f"Optimal value: {self.cvxpy_y:.4f}")
 
     def compare_with_cvxpy(self):
+        """Compare the current solution with CVXPY."""
         self.x_diff = np.linalg.norm(self.cvxpy_x - self.v_star)
         self.y_diff = np.abs(self.cvxpy_y - self.pb.y)
         return self.x_diff, self.y_diff
 
     def get_cvxpy_w_star(self):
+        """Get the optimal point of the LASSO problem from CVXPY."""
         self.cvxpy_w_star = np.linalg.lstsq(self.X, self.y + self.cvxpy_x, rcond=None)
         self.cvxpy_w_stars.append(self.w_star)
         return self.w_star[0]
 
     def try_mus(self, mus, x0, t0, centering_kwargs, error=1e-10, tol=0, **kwargs):
+        """Generate multiple problems for the given values of mus."""
         results = {}
         for mu in (pbar := tqdm(mus)):
             pbar.set_postfix_str(f"mu={mu}")
             self.initialise_dual_problem(
-                x0, t0, mu, centering_kwargs, error=1e-10, tol=0, **kwargs
+                x0, t0, mu, centering_kwargs, error=error, tol=tol, **kwargs
             )
             gaps, steps = self.calculate_dual_gap()
             total_steps = self.get_number_newton_steps()
@@ -563,6 +575,7 @@ class LASSOProblem:
         return results
 
     def calculate_results_from_pb_lists(self):
+        """Calcultate the results from the list of problems."""
         results = {}
         for pb in (pbar := tqdm(self.pbs)):
             pbar.set_postfix_str(f"mu={pb.mu}")
@@ -579,6 +592,7 @@ class LASSOProblem:
         return results
 
     def plot_results(self, submus=None, figsize=None, **kwargs):
+        """Plot the results in a single figure."""
         fig, axs = plt.subplots(2, 1, figsize=figsize)
 
         mus = self.results.keys()
