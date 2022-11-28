@@ -300,5 +300,5 @@ class LogBarrier(FunctionHelper):
             self.barriers.append(barrier)
             total_barrier += barrier
 
-        f, g, h = barrier.f, barrier.g, barrier.h
+        f, g, h = total_barrier.f, total_barrier.g, total_barrier.h
         super().__init__(f, g, h)
