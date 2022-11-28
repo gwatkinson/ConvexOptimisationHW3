@@ -432,7 +432,10 @@ class QuadraticBarrierMethod(BarrierMethod):
 
 
 class LASSOProblem:
+    """Class that represent the LASSO problem."""
+    
     def __init__(self, X, y, ld):
+        """Initiate a LASSO problem and the dual problem."""
         self.X = X
         self.y = y
         self.ld = ld

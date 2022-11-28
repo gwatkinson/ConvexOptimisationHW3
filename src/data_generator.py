@@ -4,7 +4,7 @@ import numpy as np
 
 
 def generate_data(N=20, D=50, ld=10, sigma=5, density=0.2):
-    "Generates data matrix X and observations Y."
+    """Generate data matrix X and observations Y."""
     np.random.seed(1)
     beta_star = np.random.randn(D)
     idxs = np.random.choice(range(D), int((1 - density) * D), replace=False)
