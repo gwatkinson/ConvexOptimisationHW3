@@ -18,6 +18,7 @@ dependencies:
   - docformatter
   - nptyping
   - scikit-learn
+  - tqdm
 
 platforms:
   - linux-64
