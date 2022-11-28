@@ -25,7 +25,7 @@ good-names=i,
 
 [DESIGN]
 # Maximum number of arguments for function / method.
-max-args=7
+max-args=15
 
 # Maximum number of attributes for a class (see R0902).
 max-attributes=100
@@ -98,7 +98,8 @@ disable=raw-checker-failed,
         use-symbolic-message-instead,
         unnecessary-lambda-assignment,
         too-few-public-methods,
-        missing-class-docstring
+        missing-class-docstring,
+        invalid-name
 
 
 [SIMILARITIES]
